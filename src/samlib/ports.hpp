@@ -62,8 +62,7 @@ public:
     template<typename Val>
     bool send_to(const Val& val)
     {
-        elem->send(val);
-        return true;
+        return elem->send(val);
     }
 };
 
