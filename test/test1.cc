@@ -1,10 +1,10 @@
 #include <unistd.h>
 #include <iostream>
-#include <samlib/agent/agent.hpp>
+#include <samlib/agent/base.hpp>
 
 
 struct my_agent
-  : public samlib::agent_base<double>
+  : public samlib::base<double>
 {
   void run()
   {

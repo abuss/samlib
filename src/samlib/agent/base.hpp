@@ -9,14 +9,14 @@ namespace samlib
 {
 
 template <typename T>
-class agent_base
+class base
 {
-  typedef samlib::mailbox<T>  mailbox_type;
+  typedef mailbox<T>  mailbox_type;
 
-  mailbox_type _mbox;
+  mailbox_type  _mbox;
+  std::thread   executor;
 
 protected:
-  std::thread executor;
 
   T receive()
   {
@@ -28,12 +28,12 @@ protected:
     return _mbox.try_receive();
   }
 
-  agent_base &operator=(const agent_base &)
+  base &operator=(const base &)
   {
     return *this;
   }
 
-  virtual ~agent_base() = default;
+  virtual ~base() = default;
 
   virtual void run() = 0;
 

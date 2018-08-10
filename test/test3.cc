@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <iostream>
 
-#include <samlib/agent/agent.hpp>
+#include <samlib/agent.hpp>
 
 
 template<typename GS, typename Tin, typename Tout=Tin>

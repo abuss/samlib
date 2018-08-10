@@ -6,10 +6,10 @@
 
 template<typename GS, typename T, typename Task>
 struct ping_pong_agent
-  : public samlib::agent_base<T>
+  : public samlib::base<T>
 {
   GS*                      global_state;
-  samlib::agent_base<T>*   mbox_output;
+  samlib::base<T>*   mbox_output;
 
   Task producer;
 
@@ -17,7 +17,7 @@ struct ping_pong_agent
     : global_state{nullptr}, mbox_output{nullptr}
   { }
 
-  ping_pong_agent(GS& gstate, samlib::agent_base<T>& mb_out, Task fn)
+  ping_pong_agent(GS& gstate, samlib::base<T>& mb_out, Task fn)
     : global_state(&gstate),
       mbox_output{&mb_out},
       producer(fn)

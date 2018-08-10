@@ -3,7 +3,7 @@
 #include <iostream>
 #include <chrono>
 
-#include <samlib/agent/agent.hpp>
+#include <samlib/agent.hpp>
 
 namespace samlib
 {
@@ -11,19 +11,23 @@ namespace samlib
 using namespace std::literals::chrono_literals;
 
 template <typename GS, typename Tin, typename Tout = Tin>
-struct gen_agent
-    : public samlib::agent<GS, Tin, Tout>
+class generator_agent
+  : public agent<GS, Tin, Tout>
 {
-  typedef samlib::agent<GS, Tin, Tout> base_t;
-  typedef std::function<Tout(Tin)> Task;
+  typedef agent<GS, Tin, Tout>  base_t;
+  typedef std::function<Tout(Tin)>      task_t;
+
+  task_t task;
+
+protected:
 
   using base_t::global_state;
   using base_t::outputs;
+
+public:
   using typename base_t::agent;
 
-  Task task;
-
-  gen_agent(GS &gstate, Task fn)
+  generator_agent(GS &gstate, task_t&& fn)
     : base_t(gstate),
       task(fn)
   { }
@@ -38,7 +42,8 @@ struct gen_agent
         Tin n = *dat;
         while ((n > 0) && (!global_state->terminate))
         {
-          std::get<0>(outputs)->send(task(n));
+          outputs.template send_to<0>(task(n));
+          // std::get<0>(outputs)->send(task(n));
           global_state->ngen += 1;
           ++ngen;
           --n;
@@ -46,6 +51,7 @@ struct gen_agent
       }
       else
       {
+        // TODO: check if there is a better way to do this
         std::this_thread::sleep_for(20ms);
       }
     }
