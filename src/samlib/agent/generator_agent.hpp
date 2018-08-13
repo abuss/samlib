@@ -42,8 +42,7 @@ public:
         Tin n = *dat;
         while ((n > 0) && (!global_state->terminate))
         {
-          outputs.template send_to<0>(task(n));
-          // std::get<0>(outputs)->send(task(n));
+          samlib::send_to<0>(outputs,task(n));
           global_state->ngen += 1;
           ++ngen;
           --n;

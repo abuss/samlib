@@ -1,6 +1,6 @@
 #pragma once
 
-#include <samlib/agent/agent.hpp>
+#include <samlib/agent.hpp>
 
 namespace samlib
 {
@@ -33,8 +33,7 @@ public:
     while (!global_state->terminate)
     {
       if (auto dat = this->try_receive())
-        outputs.template send_to<0>(task(std::move(*dat)));
-        // std::get<0>(outputs)->send(task(std::move(*dat)));
+        samlib::send_to<0>(outputs, task(std::move(*dat)));
     }
   }
 };
