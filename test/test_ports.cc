@@ -11,11 +11,12 @@ int main()
     auto m1 = samlib::mailbox<int>();
     auto m2 = samlib::mailbox<float>();
 
-    test.get<0>() = &m1;
-    test.get<1>() = &m2;
+    samlib::get<0>(test) = &m1;
+    std::get<1>(test) = &m2;
 
     cout << test.size() << endl;
-    cout << test.send_to<1>(45) << endl;
+    // cout << test.send_to<1>(45) << endl;
+    cout << samlib::send_to<1>(test,45) << endl;
     cout << "m1 size: " << m1.size_approx() << endl;
     cout << "m2 size: " << m2.size_approx() << endl;
 
