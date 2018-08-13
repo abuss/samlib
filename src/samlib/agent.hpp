@@ -15,29 +15,35 @@ protected:
   typedef ports<mailbox<Tout>*...> ports_t;
 
   GS *global_state;
-  ports_t outputs;
+  ports_t* outputs;
 
 public:
 
   agent()
-    : global_state{nullptr}
+    : global_state{nullptr},
+      outputs{nullptr}
   { }
 
   agent(GS &gstate)
     : global_state(&gstate)
   { }
 
+  ~agent()
+  {
+    delete outputs;
+  }
+  
   template <int i, typename P>
   agent& set_output(P &p)
   {
-    outputs.template get<i>() = &p.mbox();
+    outputs->template get<i>() = &p.mbox();
     return *this;
   }
 
   template <typename... Ps>
   agent& set_outputs(Ps &... ps)
   {
-    outputs = ports(&ps.mbox()...);
+    outputs = new ports(&ps.mbox()...);
     return *this;
   }
 

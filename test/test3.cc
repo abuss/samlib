@@ -27,7 +27,7 @@ struct ping_pong_agent
     while (!global_state->terminate) {
       Tin data = this->receive();
       Tout new_data = task(data);
-      outputs.template send_to<0>(new_data);
+      outputs->template send_to<0>(new_data);
     }
   }
 };
