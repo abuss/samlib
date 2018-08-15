@@ -1,6 +1,6 @@
 #pragma once
 
-#include <samlib/agent/base.hpp>
+#include <samlib/base.hpp>
 #include <samlib/ports.hpp>
 
 namespace samlib
