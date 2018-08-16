@@ -2,13 +2,13 @@
 #include <unistd.h>
 #include <iostream>
 
-#include <samlib/agent/base.hpp>
+#include <samlib/base.hpp>
 
 template<typename GS, typename T, typename Task>
 struct ping_pong_agent
   : public samlib::base<T>
 {
-  GS*                      global_state;
+  GS*                global_state;
   samlib::base<T>*   mbox_output;
 
   Task producer;

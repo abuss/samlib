@@ -1,25 +1,21 @@
 #pragma once
 
+#include <samlib/agent.hpp>
+
 namespace samlib
 {
 
-template <typename Derived>
 struct environment
 {
 
   bool terminate = false;
 
-  template <typename A, typename... Args>
-  A make_agent(Args... args)
+  template <typename... Args, typename Fn>
+  agent<environment, Args...> make_agent(Fn&& fn)
   {
-    return A(*static_cast<Derived *>(this), args...);
+    return agent<environment, Args...>(*this, fn);
   }
 
-  template <typename A, typename... Args>
-  A *make_agent_ptr(Args... args)
-  {
-    return new A(*static_cast<Derived *>(this), args...);
-  }
 };
 
 } // namespace samlib

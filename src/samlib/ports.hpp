@@ -10,7 +10,7 @@ namespace samlib {
   using std::get;
 
   template<size_t I, typename P, typename Val>
-  bool send_to(P& ports_, Val&& val)
+  constexpr bool send_to(P& ports_, Val&& val)
   {
     return std::get<I>(ports_)->send(val);
   }

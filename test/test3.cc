@@ -14,14 +14,15 @@ struct ping_pong_agent
 
   using base_t::global_state;
   using base_t::outputs;
+  using base_t::agent;
 
   task_t task;
 
-  ping_pong_agent(GS &gstate, task_t fn)
-    : base_t{gstate},
-      task{fn}
+  ping_pong_agent(GS& state, task_t&& fn)
+  : base_t{state},
+    task{fn}
   { }
-  
+
   void run()
   {
     while (!global_state->terminate) {

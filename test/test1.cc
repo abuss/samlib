@@ -1,6 +1,6 @@
 #include <unistd.h>
 #include <iostream>
-#include <samlib/agent/base.hpp>
+#include <samlib/base.hpp>
 
 
 struct my_agent

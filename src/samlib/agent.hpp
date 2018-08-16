@@ -2,45 +2,50 @@
 
 #include <samlib/base.hpp>
 #include <samlib/ports.hpp>
+#include <samlib/mailbox.hpp>
 
 namespace samlib
 {
 
-template <typename GS, typename Tin, typename... Tout>
+template <typename State, typename Tin, typename... Tout>
 class agent
-  : public base<Tin>
+    : public base<Tin>
 {
 protected:
+  using state_t = State;
+  using ports_t = ports<mailbox<Tout> *...>;
+  using task_t = std::function<void(state_t&, mailbox<Tin> &, ports_t &)>;
 
-  typedef ports<mailbox<Tout>*...> ports_t;
-  
-  GS*     global_state;
+  state_t *global_state;
   ports_t outputs;
+  task_t task;
 
 public:
+  agent(agent&& other) = default;
 
-  agent()
-    : global_state{nullptr}
+  agent(state_t &gstate)
+      : global_state{&gstate}
   { }
 
-  agent(GS &gstate)
-    : global_state(&gstate)
+  agent(state_t &gstate, task_t &&fn)
+      : global_state{&gstate},
+        task{fn}
   { }
-  
-  template <int i, typename P>
-  agent& set_output(P &p)
-  {
-    samlib::get<i>(outputs) = &p.mbox();
-    return *this;
-  }
 
   template <typename... Ps>
-  agent& set_outputs(Ps &... ps)
+  agent &set_outputs(Ps &... ps)
   {
-    outputs = std::make_tuple(&ps.mbox()...);
+    outputs = make_ports(&ps.mbox()...);
     return *this;
   }
 
+  virtual void run()
+  {
+    while (!global_state->terminate)
+    {
+      task(*global_state, this->mbox(), outputs);
+    }
+  }
 };
 
 } // namespace samlib

@@ -38,7 +38,7 @@ protected:
   virtual void run() = 0;
 
 public:
-  mailbox_type &mbox()
+  mailbox_type& mbox()
   {
     return _mbox;
   }
