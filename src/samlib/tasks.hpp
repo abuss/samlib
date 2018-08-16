@@ -32,10 +32,10 @@ auto generator = [](auto&& fn)
         --n;
       }
     }
-    //else {
+    else {
       // TODO: check if there is a better way to do this
-     // std::this_thread::sleep_for(20ms);
-    //}
+      std::this_thread::sleep_for(1ms);
+    }
   };
 };
 
@@ -47,9 +47,8 @@ auto sink = [](auto&& fn)
   return [fn](auto& state, auto& in_port, auto& out_ports) {
     if (auto data = in_port.try_receive())
       fn(*data);
-    //else
-      // std::this_thread::yield();
-    //  std::this_thread::sleep_for(20ms);
+    else
+      std::this_thread::sleep_for(1ms);
   };
 };
     
