@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <optional>
+#include <chrono>
 
 #ifndef NO_CONCURRENT_QUEUE
 #include "concurrentqueue.h"
@@ -12,6 +13,8 @@
 
 namespace samlib
 {
+ 
+  using namespace std::literals::chrono_literals;
 
   template<typename T>
   class mailbox
@@ -22,7 +25,7 @@ namespace samlib
 #endif
   {
   public:
-    
+
     typedef T value_type;
 
 #ifndef NO_CONCURRENT_QUEUE
@@ -77,7 +80,7 @@ namespace samlib
     {
       value_type value;
       while (!this->try_dequeue(value)) {
-        std::this_thread::yield();
+        std::this_thread::sleep_for(1us);
       }
       return std::move(value);
     }
