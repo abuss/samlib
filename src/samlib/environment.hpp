@@ -16,6 +16,12 @@ struct environment
     return agent<environment, Args...>(*this, fn);
   }
 
+  template <typename... Args, typename LS, typename Fn>
+  agent_local<environment, LS, Args...> make_agent_with_local(LS ls, Fn&& fn)
+  {
+    return agent_local<environment, LS, Args...>(*this, ls, fn);
+  }
+
 };
 
 } // namespace samlib
