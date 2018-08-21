@@ -11,7 +11,7 @@ auto transform = [](auto&& fn)
 {
   using namespace std::literals::chrono_literals; 
 
-  return [fn](auto& state, auto& in_port, auto& out_ports) {
+  return [fn](auto& state, auto&, auto& in_port, auto& out_ports) {
     if (auto data = in_port.try_receive()) {
       auto new_data = fn(*data);
       samlib::send_to<0>(out_ports, new_data);
@@ -29,7 +29,7 @@ auto generator = [](auto&& fn)
   // size_t ngen = 0;
   using namespace std::literals::chrono_literals; 
 
-  return [fn](auto& state, auto& in_port, auto& out_ports) {
+  return [fn](auto& state, auto&, auto& in_port, auto& out_ports) {
     if (auto dat = in_port.try_receive()) {
       auto n = *dat;
       while ((n > 0) && (!state.terminate)) {
@@ -51,7 +51,7 @@ auto sink = [](auto&& fn)
 {
   using namespace std::literals::chrono_literals; 
 
-  return [fn](auto& state, auto& in_port, auto& out_ports) {
+  return [fn](auto& state, auto&, auto& in_port, auto& out_ports) {
     if (auto data = in_port.try_receive())
       fn(*data);
     else
