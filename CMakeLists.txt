@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(samlib VERSION 0.1.0)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS "1")
 
 set(PROJECT_AUTHOR "Antal Buss")
 set(PROJECT_AUTHOR_EMAIL "antal.buss@gmail.com")

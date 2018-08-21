@@ -7,11 +7,9 @@
 namespace samlib
 {
 
-// TODO: Move this definition to environment
 struct empty_state {};
 
 
-// Agent with support of global and local state
 template <typename GState, typename LState, typename Tin, typename... Tout>
 class agent
     : public base<Tin>
@@ -34,6 +32,11 @@ public:
       : global_state{&gstate}
   { }
 
+  agent(global_state_t &gstate, task_t &&fn)
+      : global_state{&gstate},
+        task{fn}
+  { }
+
   agent(global_state_t &gstate, local_state_t&& lstate)
       : global_state{&gstate},
         local_state{lstate}
@@ -45,10 +48,6 @@ public:
         task{fn}
   { }
 
-  agent(global_state_t &gstate, task_t &&fn)
-      : global_state{&gstate},
-        task{fn}
-  { }
 
   template <typename... Ps>
   agent &set_outputs(Ps &... ps)
