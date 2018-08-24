@@ -46,7 +46,7 @@ size_t gen(size_t val)
 int main()
 {
  
-  typedef samlib::environment state_t;
+  typedef samlib::environment<samlib::base_state> state_t;
 
   struct { size_t sum; } lst;
 

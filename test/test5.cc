@@ -23,7 +23,7 @@ size_t gen(size_t val)
 int main()
 {
  
-  typedef samlib::environment state_t;
+  typedef samlib::environment<samlib::base_state> state_t;
   // typedef samlib::agent<state_t,size_t> agent_sink_t;
 
   state_t st;

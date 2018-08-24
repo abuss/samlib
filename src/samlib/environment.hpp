@@ -7,12 +7,14 @@ namespace samlib
 
 struct empty_state;
 
+struct base_state {
+  bool terminate = false;
+};
 
 template<typename Env>
 struct environment
+  : public base_state
 {
-
-  bool terminate = false;
 
   template <typename... Args, typename Fn>
   samlib::agent<Env, empty_state, Args...> make_agent(Fn&& fn)

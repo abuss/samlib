@@ -24,7 +24,7 @@ size_t pong(size_t val)
 int main()
 {
  
-  typedef samlib::environment state_t;
+  typedef samlib::environment<samlib::base_state> state_t;
   
   state_t st;
 
