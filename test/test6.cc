@@ -52,21 +52,19 @@ int main()
 
   state_t st;
 
-  auto p1 = st.make_agent<size_t,size_t>(lst, my_generator(gen));
-  auto p2 = st.make_agent<size_t>(samlib::sink(hole));
+  auto& p1 = st.make_agent<size_t,size_t>(lst, my_generator(gen));
+  auto& p2 = st.make_agent<size_t>(samlib::sink(hole));
 
   p1.set_outputs(p2);
 
-  p1.start();
-  p2.start();
-
-  // sleep(1;
+  st.start_agents();
 
   p1.send(10);
 
   sleep(5);
+
   printf("------------ Time's up ---------------\n");
-  st.terminate = true;
-  p1.wait();
-  p2.wait();
+  
+  st.wait_agents();
+
 }

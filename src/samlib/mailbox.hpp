@@ -14,8 +14,6 @@
 namespace samlib
 {
  
-  using namespace std::literals::chrono_literals;
-
   template<typename T>
   class mailbox
 #ifndef NO_CONCURRENT_QUEUE
@@ -80,7 +78,7 @@ namespace samlib
     {
       value_type value;
       while (!this->try_dequeue(value)) {
-        std::this_thread::sleep_for(1us);
+        std::this_thread::yield();
       }
       return std::move(value);
     }

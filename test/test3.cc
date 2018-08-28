@@ -9,12 +9,14 @@ template<typename GS, typename Tin, typename Tout=Tin>
 struct ping_pong_agent
   : public samlib::agent<GS,samlib::empty_state,Tin,Tout>
 {
-  typedef samlib::agent<GS,samlib::empty_state,Tin,Tout>     base_t;
-  typedef std::function<Tout(Tin)>       task_t;
+  typedef samlib::agent<GS,samlib::empty_state,Tin,Tout>  base_t;
+  typedef std::function<Tout(Tin)>                        task_t;
 
   using base_t::global_state;
   using base_t::outputs;
-  using base_t::agent;
+  using base_t::agent;  // using namespace std::literals::chrono_literals;
+
+
 
   task_t task;
 

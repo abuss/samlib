@@ -15,6 +15,7 @@ class agent
     : public base<Tin>
 {
 protected:
+  using base_t = base<Tin>;
   using global_state_t = GState;
   using local_state_t = LState;
   using ports_t = ports<mailbox<Tout> *...>;
@@ -26,7 +27,6 @@ protected:
   task_t task;
 
 public:
-  agent(agent&& other) = default;
 
   agent(global_state_t &gstate)
       : global_state{&gstate}
@@ -47,7 +47,6 @@ public:
         local_state{lstate},
         task{fn}
   { }
-
 
   template <typename... Ps>
   agent &set_outputs(Ps &... ps)

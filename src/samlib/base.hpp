@@ -8,13 +8,40 @@
 namespace samlib
 {
 
+class executor
+{
+  std::thread   executor_thread;
+
+public:
+
+  virtual void run() = 0;
+
+  void start()
+  {
+    executor_thread = std::thread([&] { run(); });
+  }
+
+  void wait()
+  {
+    if (executor_thread.joinable())
+      executor_thread.join();
+  }
+
+  void detach()
+  {
+    executor_thread.detach();
+  }
+
+};
+
+
 template <typename T>
 class base
+  : public executor
 {
   typedef mailbox<T>  mailbox_type;
 
   mailbox_type  _mbox;
-  std::thread   executor;
 
 protected:
 
@@ -28,15 +55,6 @@ protected:
     return _mbox.try_receive();
   }
 
-  base &operator=(const base &)
-  {
-    return *this;
-  }
-
-  virtual ~base() = default;
-
-  virtual void run() = 0;
-
 public:
   mailbox_type& mbox()
   {
@@ -46,22 +64,6 @@ public:
   mailbox_type *ptr_mbox()
   {
     return &_mbox;
-  }
-
-  void start()
-  {
-    executor = std::thread([&] { run(); });
-  }
-
-  void wait()
-  {
-    if (executor.joinable())
-      executor.join();
-  }
-
-  void detach()
-  {
-    executor.detach();
   }
 
   bool send(const T &value)
