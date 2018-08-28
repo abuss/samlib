@@ -17,7 +17,7 @@ class environment
   : public base_state
 {
 
-  std::vector<samlib::executor*> agents;
+  std::vector<std::pair<samlib::executor*,bool>> agents;
 
 public:
 
@@ -25,9 +25,10 @@ public:
   {
     wait_agents();
     for(auto& a : agents) {
-      if (a)
-        delete a;
-        a = nullptr;
+      if (a.first && a.second) {
+        delete a.first;
+        a.first = nullptr;
+      }
     }
   }
 
@@ -36,7 +37,7 @@ public:
   {
     typedef agent<Env, empty_state, Args...> agent_t;
     agent_t* ptr =  new agent_t(*static_cast<Env*>(this), fn);
-    agents.push_back(ptr);
+    agents.push_back(std::make_pair(ptr,true));
     return *ptr;
   }
 
@@ -46,22 +47,28 @@ public:
   {
     typedef agent<Env, LS, Args...> agent_t;
     agent_t* ptr = new agent_t(*static_cast<Env*>(this), ls, fn);
-    agents.push_back(ptr);
+    agents.push_back(std::make_pair(ptr,true));
     return *ptr;
+  }
+
+  template<typename A>
+  void register_agent(A& a)
+  {
+    agents.push_back(std::make_pair(&a,false));
   }
 
   void start_agents()
   {
     this->terminate = false;
     for(auto& a : agents)
-      a->start();
+      a.first->start();
   }
 
   void wait_agents()
   {
     stop_agents();
     for(auto& a : agents)
-      a->wait();
+      a.first->wait();
   }
 
   void stop_agents()

@@ -14,6 +14,8 @@ class executor
 
 public:
 
+  virtual ~executor() {}
+
   virtual void run() = 0;
 
   void start()
