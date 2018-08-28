@@ -17,12 +17,18 @@ struct ping_pong_agent
     : global_state{nullptr}, mbox_output{nullptr}
   { }
 
-  ping_pong_agent(GS& gstate, samlib::base<T>& mb_out, Task fn)
+  ping_pong_agent(GS& gstate, Task fn)
     : global_state(&gstate),
-      mbox_output{&mb_out},
       producer(fn)
   { }
-  
+
+  ~ping_pong_agent() { }
+
+  void set_output(samlib::base<T>& mb_out)
+  {
+    mbox_output = &mb_out;
+  }
+
   void run()
   {
     while (!global_state->terminate) {
@@ -59,11 +65,11 @@ int main()
   struct state { bool terminate = false; };  
   state st;
   
-  ping_pong_agent<state,double,ping> p1;
-  ping_pong_agent<state,double,pong> p2;
+  ping_pong_agent<state,double,ping> p1(st, ping());
+  ping_pong_agent<state,double,pong> p2(st, pong());
 
-  p1 = ping_pong_agent<state,double,ping>(st, p2, ping());
-  p2 = ping_pong_agent<state,double,pong>(st, p1, pong());
+  p1.set_output(p2);
+  p2.set_output(p1);
 
   p1.start();
   p2.start();
