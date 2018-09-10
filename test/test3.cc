@@ -14,9 +14,7 @@ struct ping_pong_agent
 
   using base_t::global_state;
   using base_t::outputs;
-  using base_t::agent;  // using namespace std::literals::chrono_literals;
-
-
+  using typename base_t::agent;  // using namespace std::literals::chrono_literals;
 
   task_t task;
 
