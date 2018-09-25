@@ -64,14 +64,14 @@ namespace samlib
 #endif
 
 
-    bool send(value_type const& value)
+    bool send(const value_type& value)
     {
       return this->enqueue(value);
     }
 
     bool send(value_type&& value)
     {
-      return this->enqueue(std::move(value));
+      return this->enqueue(std::forward<value_type>(value));
     }
 
     value_type receive()
@@ -80,14 +80,16 @@ namespace samlib
       while (!this->try_dequeue(value)) {
         std::this_thread::yield();
       }
-      return std::move(value);
+      return value;
     }
     
     std::optional<value_type> try_receive()
     {
-      value_type value;
-      if (this->try_dequeue(value)) {
-        return std::optional<value_type>{std::move(value)};
+      if (this->size_approx()>0) {
+        value_type value;
+        if (this->try_dequeue(value))
+          return std::make_optional(std::move(value));
+          // return std::optional<value_type>{std::in_place, std::move(value)};
       }
       return std::nullopt;
     }

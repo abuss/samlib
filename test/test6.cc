@@ -8,7 +8,7 @@
 #include <samlib/environment.hpp>
 
 
-auto my_generator = [](auto&& fn)
+auto my_generator = [](auto fn)
 {
   // size_t ngen = 0;
   using namespace std::literals::chrono_literals; 
@@ -48,7 +48,7 @@ int main()
  
   typedef samlib::environment<samlib::base_state> state_t;
 
-  struct { size_t sum; } lst;
+  struct { size_t sum=0; } lst;
 
   state_t st;
 

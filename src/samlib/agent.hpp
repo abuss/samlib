@@ -37,7 +37,7 @@ public:
         task{fn}
   { }
 
-  agent(global_state_t &gstate, local_state_t&& lstate)
+  agent(global_state_t &gstate, local_state_t lstate)
       : global_state{&gstate},
         local_state{lstate}
   { }
@@ -55,7 +55,7 @@ public:
     return *this;
   }
 
-  virtual void run()
+  /*virtual*/ void run()
   {
     while (!global_state->terminate)
     {

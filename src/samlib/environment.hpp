@@ -25,7 +25,7 @@ public:
   {
     wait_agents();
     for(auto& a : agents) {
-      if (a.first && a.second) {
+      if (a.first!=nullptr && a.second) {
         delete a.first;
         a.first = nullptr;
       }
@@ -51,10 +51,12 @@ public:
     return *ptr;
   }
 
-  template<typename A>
-  void register_agent(A& a)
+  template<typename A, typename... Args>
+  A& create_agent(Args... args)
   {
-    agents.push_back(std::make_pair(&a,false));
+    A* ptr = new A(*static_cast<Env*>(this), args...);
+    agents.push_back(std::make_pair(ptr,true));
+    return *ptr;
   }
 
   void start_agents()
