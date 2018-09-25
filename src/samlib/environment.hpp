@@ -25,7 +25,7 @@ public:
   {
     wait_agents();
     for(auto& a : agents) {
-      if (a.first && a.second) {
+      if (a.first!=nullptr && a.second) {
         delete a.first;
         a.first = nullptr;
       }

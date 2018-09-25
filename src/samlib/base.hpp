@@ -49,10 +49,10 @@ protected:
 
   T receive()
   {
-    return std::move(_mbox.receive());
+    return _mbox.receive();
   }
 
-  std::optional<T> try_receive()
+  inline std::optional<T> try_receive()
   {
     return _mbox.try_receive();
   }
@@ -63,19 +63,19 @@ public:
     return _mbox;
   }
 
-  mailbox_type *ptr_mbox()
+  mailbox_type* ptr_mbox()
   {
     return &_mbox;
   }
 
-  bool send(const T &value)
+  bool send(const T& value)
   {
     return _mbox.send(value);
   }
 
-  bool send(T &&value)
+  bool send(T&& value)
   {
-    return _mbox.send(std::move(value));
+    return _mbox.send(std::forward<T>(value));
   }
 };
 

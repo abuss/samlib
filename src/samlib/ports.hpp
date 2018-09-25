@@ -10,13 +10,13 @@ namespace samlib {
   using std::get;
 
   template<size_t I, typename P, typename Val>
-  constexpr bool send_to(P& ports_, Val&& val)
+  constexpr bool send_to(const P& ports_, Val&& val)
   {
-    return std::get<I>(ports_)->send(val);
+    return std::get<I>(ports_)->send(std::forward<Val>(val));
   }
 
   template <typename... T>
-  ports<T...> make_ports(T&&... args)
+  ports<T...> make_ports(T... args)
   {
     return std::make_tuple(args...);
   }
