@@ -85,12 +85,11 @@ namespace samlib
     
     std::optional<value_type> try_receive()
     {
-      if (this->size_approx()>0) {
-        value_type value;
-        if (this->try_dequeue(value))
-          return std::make_optional(std::move(value));
+      value_type value;
+      // if (this->try_dequeue(value))
+      if (this->try_dequeue_non_interleaved(value))
+        return std::make_optional(std::move(value));
           // return std::optional<value_type>{std::in_place, std::move(value)};
-      }
       return std::nullopt;
     }
 

@@ -7,6 +7,8 @@
 namespace samlib
 {
 
+using namespace std::literals::chrono_literals;
+
 template<typename Fn>
 auto transform(Fn fn)
 {
@@ -20,28 +22,6 @@ auto transform(Fn fn)
           };
 };
 
-
-auto generator2 = [](auto fn)
-{
-  // size_t ngen = 0;
-
-  return [fn](auto& state, auto, auto& in_port, const auto& out_ports) {
-    if (auto dat = in_port.try_receive()) {
-      auto n = *dat;
-      auto ngen = n;
-      while ((n > 0) && (!state.terminate)) {
-        samlib::send_to<0>(out_ports,fn(n));
-        // global.ngen += 1;
-        // ++ngen;
-        --n;
-      }
-      printf("generated: %ul\n",ngen);
-    }
-    else {
-      std::this_thread::yield();
-    }
-  };
-};
 
 template<typename Fn>
 auto generator(Fn fn)
@@ -59,7 +39,7 @@ auto generator(Fn fn)
             }
           }
           else {
-            std::this_thread::yield();
+            std::this_thread::sleep_for(20ms);
           }
         };
 };
