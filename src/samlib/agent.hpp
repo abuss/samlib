@@ -28,34 +28,34 @@ protected:
 
 public:
 
-  agent(global_state_t &gstate)
+  constexpr agent(global_state_t &gstate)
       : global_state{&gstate}
   { }
 
-  agent(global_state_t &gstate, task_t &&fn)
+  constexpr agent(global_state_t &gstate, task_t &&fn)
       : global_state{&gstate},
         task{fn}
   { }
 
-  agent(global_state_t &gstate, local_state_t lstate)
+  constexpr agent(global_state_t &gstate, local_state_t lstate)
       : global_state{&gstate},
         local_state{lstate}
   { }
 
-  agent(global_state_t &gstate, local_state_t lstate, task_t &&fn)
+  constexpr agent(global_state_t &gstate, local_state_t lstate, task_t &&fn)
       : global_state{&gstate},
         local_state{lstate},
         task{fn}
   { }
 
   template <typename... Ps>
-  agent &set_outputs(Ps &... ps)
+  constexpr agent &set_outputs(Ps &... ps)
   {
     outputs = make_ports(&ps.mbox()...);
     return *this;
   }
 
-  /*virtual*/ void run()
+  void run()
   {
     while (!global_state->terminate)
     {

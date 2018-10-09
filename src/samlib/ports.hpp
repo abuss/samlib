@@ -16,7 +16,7 @@ namespace samlib {
   }
 
   template <typename... T>
-  ports<T...> make_ports(T... args)
+  constexpr ports<T...> make_ports(T... args)
   {
     return std::make_tuple(args...);
   }
