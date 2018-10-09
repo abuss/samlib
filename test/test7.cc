@@ -22,14 +22,14 @@ payload ping(payload val)
   val.n++;
   printf("Ping -> %lu (%lu)\n", ++val.data[0],val.n);
   return val;
-};
+}
 
 payload pong(payload val)
 {
   val.n++;
   printf("%lu (%lu) <- Pong\n", ++val.data[1], val.n);
   return val;
-};
+}
 
 
 int main()

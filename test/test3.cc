@@ -38,14 +38,14 @@ double ping(double val)
 {
     printf("Ping -> %f\n",val++);
     return val;
-};
+}
 
 
 double pong(double val)
 {
     printf("%f <- Pong\n",val++);
     return val;
-};
+}
 
 
 int main()

@@ -11,13 +11,13 @@
 void hole(size_t val)
 {
   printf("To the hole -> %lu\n", val);
-};
+}
 
 size_t gen(size_t val)
 {
   printf("Generate -> %lu\n", ++val);
   return val;
-};
+}
 
 
 int main()

@@ -38,7 +38,7 @@ struct generator
   }
 };
 
-int main(int argc, char const *argv[])
+int main()
 {
   std::cout << "Hello, from samlib!\n";
   my_agent a;

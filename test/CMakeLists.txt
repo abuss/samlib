@@ -6,7 +6,7 @@ set(samlib_SRC_DIR ${PROJECT_SRC_DIR})
 macro(ADD_SAMLIB_TEST TEST_NAME TEST_SOURCE)
     add_executable(${TEST_NAME} ${TEST_SOURCE})
     target_include_directories(${TEST_NAME} PRIVATE ${samlib_SRC_DIR})
-    target_link_libraries(${TEST_NAME} PRIVATE ${COMMON_LINK_LIBS})
+    target_link_libraries(${TEST_NAME} PRIVATE ${COMMON_LINK_LIBS} ${CMAKE_THREAD_LIBS_INIT})
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endmacro()
 

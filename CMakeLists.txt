@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.9.0)
 project(samlib VERSION 0.1.0)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "1")
@@ -11,39 +11,93 @@ message("* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 message("* Copyright (c) 2018 ${PROJECT_AUTHOR} <${PROJECT_AUTHOR_EMAIL}>")
 message("*")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/)
+option(BUILD_TESTS "Build tests" ON)
+option(BUILD_DOCS "Build documentation" ON)
+# option(BUILD_EXAMPLES "Build examples" ON)
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+# If no build type is set, set to release.
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE Release)
+endif(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE_SUFFIX)
+
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -pedantic")
 
-# Find Open Multi-Processing (OpenMP)
-find_package(OpenMP QUIET)
-if(OPENMP_FOUND)
-    message(STATUS "Found OpenMP")
-    # In case that OMP is found we force to disable Intel TBB since
-    # tiny-dnn does not support mutiple multithreading backends.
-    # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+# Find threading support
+find_package(Threads REQUIRED QUIET)
+if(THREADS_FOUND)
+    message(STATUS "Found Thread support")
 elseif(NOT OPENMP_FOUND)
-    # In case the user sets the flag USE_OMP to ON, the CMake build-tree
-    # will require to find OMP in your system. Otherwise, the user can
-    # set the CMAKE_C_FLAGS and CMAKE_CXX_FLAGS by hand.
-    message(FATAL_ERROR "Can't find OpenMP. Please set OpenMP_C_FLAGS & "
-            "OpenMP_CXX_FLAGS")
+    message(FATAL_ERROR "Can't find Thread support.")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "C++17 support has been enabled by default.")
 
-SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+# include(CTest)
+# enable_testing()
 
-include(CTest)
-enable_testing()
+# Tests
+if ((BUILD_TESTS) OR (NOT CMAKE_BUILD_TYPE MATCHES "RELEASE"))
+  add_subdirectory(test)
+endif()
 
-add_subdirectory(test)
+# Examples
+#if (BUILD_EXAMPLES)
+#  add_subdirectory(doc/src/examples)
+#endif()
 
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
+
+# if (BUILD_DOCS)
+#     # check if Doxygen is installed
+#     find_package(Doxygen)
+
+#     if (DOXYGEN_FOUND)
+#         # # set input and output files
+#         # set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/../docs/Doxyfile.in)
+#         set(DOXYGEN_CONF ${CMAKE_SOURCE_DIR}/doc/Doxyfile)
+
+#         # # request to configure the file
+#         # configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+#         # message("Doxygen build started")
+
+#         set(SPHINX_HTML ON)
+#         # note the option ALL which allows to build the docs together with the application
+#         add_custom_target( doc_doxygen ALL
+#             COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_CONF}
+#             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#             COMMENT "Generating API documentation with Doxygen"
+#             VERBATIM )
+#     else (DOXYGEN_FOUND)
+#         message("Doxygen need to be installed to generate the doxygen documentation")
+#     endif (DOXYGEN_FOUND)
+# endif()
+
+
+# set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+# set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+# include(CPack)
+
+message(STATUS "-------------------------------")
+message(STATUS "++ Setup: ")
+message(STATUS "System:         " ${CMAKE_SYSTEM})
+message(STATUS "Build dir:      " ${CMAKE_BINARY_DIR})
+message(STATUS "Build type:     " ${CMAKE_BUILD_TYPE})
+message(STATUS "CXX:            " ${CMAKE_CXX_COMPILER})
+message(STATUS "CXX_ID:         " ${CMAKE_CXX_COMPILER_ID})
+message(STATUS "CXXFLAGS:       " ${CMAKE_CXX_FLAGS} " " ${CMAKE_CXX_FLAGS_${BUILD_TYPE_SUFFIX}})
+message(STATUS "CXX_LINK_FLAGS: " ${CMAKE_THREAD_LIBS_INIT})
+message(STATUS "Verbose:        " ${CMAKE_VERBOSE_MAKEFILE})
+message(STATUS "")
+message(STATUS "++ Lib Info")
+message(STATUS "ar:             " ${CMAKE_AR})
+message(STATUS "ranlib:         " ${CMAKE_RANLIB})
+message(STATUS "++ Options")
+message(STATUS "Tests:          " ${BUILD_TESTS})
+message(STATUS "-------------------------------")

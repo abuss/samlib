@@ -12,13 +12,13 @@ size_t ping(size_t val)
 {
   printf("Ping -> %lu\n", val++);
   return val;
-};
+}
 
 size_t pong(size_t val)
 {
   printf("%lu <- Pong\n", val++);
   return val;
-};
+}
 
 
 int main()
