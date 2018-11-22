@@ -10,7 +10,7 @@ namespace samlib
 
 class executor
 {
-  std::thread   executor_thread;
+  std::vector<std::thread>   executor_threads;
 
 public:
 
@@ -18,20 +18,23 @@ public:
 
   virtual void run() = 0;
 
-  void start()
+  void start(u_int n=1)
   {
-    executor_thread = std::thread([&] { run(); });
+    for (u_int i=0;i<n;++i)
+      executor_threads.emplace_back(std::thread([&] { run(); }));
   }
 
   void wait()
   {
-    if (executor_thread.joinable())
-      executor_thread.join();
+    for (auto& thrd : executor_threads)
+      if (thrd.joinable())
+        thrd.join();
   }
 
   void detach()
   {
-    executor_thread.detach();
+    for (auto& thrd : executor_threads)
+      thrd.detach();
   }
 
 };
@@ -63,10 +66,6 @@ public:
     return _mbox;
   }
 
-  mailbox_type* ptr_mbox()
-  {
-    return &_mbox;
-  }
 
   bool send(const T& value)
   {
