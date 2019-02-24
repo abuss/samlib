@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (first!=tmp) {
+  if (first!=p) {
     p->set_outputs(*first);
   }
 
