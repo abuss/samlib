@@ -32,8 +32,13 @@ namespace samlib
     };
 
     std::vector<agent_def> agents;
+    bool autostart_agents = false;
 
   public:
+
+    environment(bool auto_start=false)
+      : autostart_agents(auto_start)
+    { }
 
     ~environment()
     {
@@ -55,6 +60,8 @@ namespace samlib
       typedef agent<Env, empty_state, In> agent_t;
       agent_t* ptr =  new agent_t(*static_cast<Env*>(this), fn);
       agents.push_back(agent_def{ptr, nworkers, true});
+      if (autostart_agents)
+        ptr->start(nworkers);
       return ptr->ref();
     }
 
@@ -67,6 +74,8 @@ namespace samlib
       typedef typename agent_t::agent_ref_type  agent_ref_t;
       agent_t* ptr =  new agent_t(*static_cast<Env*>(this), ls, fn);
       agents.push_back(agent_def{ptr, nworkers, true});
+      if (autostart_agents)
+        ptr->start(nworkers);
       return agent_ref_t(ptr);
     }
 
