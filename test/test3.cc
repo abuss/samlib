@@ -3,32 +3,43 @@
 #include <iostream>
 
 #include <samlib/agent.hpp>
+#include <samlib/agent_ref.hpp>
 
 
 template<typename GS, typename Tin, typename Tout=Tin>
 struct ping_pong_agent
-  : public samlib::agent<GS,samlib::empty_state,Tin,Tout>
+  : public samlib::agent<GS,samlib::empty_state,Tin>
 {
-  typedef samlib::agent<GS,samlib::empty_state,Tin,Tout>  base_t;
-  typedef std::function<Tout(Tin)>                        task_t;
+  typedef samlib::agent<GS,samlib::empty_state,Tin>     base_t;
+  typedef std::function<Tout(Tin)>                      task_t;
+  typedef samlib::agent_ref<ping_pong_agent>            agent_ref_type;
+
+  typedef samlib::agent_ref<ping_pong_agent<GS,Tin,Tout>> dest_agent_t;
 
   using base_t::global_state;
-  using base_t::outputs;
   using typename base_t::agent;  // using namespace std::literals::chrono_literals;
 
-  task_t task;
 
-  ping_pong_agent(GS& state, task_t&& fn)
+  task_t task;
+  dest_agent_t& out;
+
+  ping_pong_agent(GS& state, task_t&& fn, dest_agent_t& d)
   : base_t{state},
-    task{fn}
+    task{fn},
+    out(d)
   { }
+
+  agent_ref_type ref()
+  {
+    return agent_ref_type(this);
+  }
 
   void run()
   {
     while (!global_state->terminate) {
       Tin data = this->receive();
       Tout new_data = task(data);
-      samlib::send_to<0>(outputs,new_data);
+      out.send(new_data);
     }
   }
 };
@@ -50,16 +61,19 @@ double pong(double val)
 
 int main()
 {
-  struct state { bool terminate = false; };  
+  struct state { bool terminate = false; };
   state st;
-  
+
   typedef ping_pong_agent<state,double> agent_t;
+  typedef agent_t::agent_ref_type agent_ref_t;
 
-  auto p1 = agent_t(st, ping);
-  auto p2 = agent_t(st, pong);
+  agent_ref_t p1,p2;
 
-  p1.set_outputs(p2);
-  p2.set_outputs(p1);
+  auto pp1 = agent_t(st, ping, p2);
+  auto pp2 = agent_t(st, pong, p1);
+
+  p1 = pp1.ref();
+  p2 = pp2.ref();
 
   p1.start();
   p2.start();

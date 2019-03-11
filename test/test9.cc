@@ -21,44 +21,30 @@ auto fn_factory(int num)
 int main(int argc, char *argv[])
 {
  
-  typedef samlib::environment<samlib::base_state> state_t;
-  typedef samlib::agent<state_t,samlib::empty_state,size_t,size_t> agent_t;
+  typedef samlib::environment<samlib::base_state> env_t;
+  typedef env_t::agent_ref_type<size_t> agent_ref_t;
 
   int n = 5;
   if (argc>1)
     n = atoi(argv[1]);
   
-  state_t st;
+  env_t st;
 
-  agent_t* p = nullptr;
-  agent_t* tmp = nullptr;
-  agent_t* first = nullptr;
-  
-  
+  std::vector<agent_ref_t> agents(n);
+
   for (int i=0;i<n;++i) {
-    p = new agent_t(st,samlib::transform(fn_factory(i)));
-    p->start();
-    if (i==0) {
-      first = p;
-      tmp = p;
-    }
-    else {
-      tmp->set_outputs(*p);
-      tmp = p;
-    }
+    agents[i] = st.make_agent<size_t>(samlib::transform(fn_factory(i), agents[(i+1)%n]) );
   }
 
-  if (first!=p) {
-    p->set_outputs(*first);
-  }
+  st.start_agents();
 
   sleep(1);
 
-  std::cout << "Starting\n";
-  first->send(1);
+  agents[0].send(1);
 
   sleep(1);
   printf("------------ Time's up ---------------\n");
 
-  st.stop_agents();
+  st.wait_agents();
+
 }

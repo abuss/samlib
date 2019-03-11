@@ -22,15 +22,13 @@ size_t gen(size_t val)
 
 int main()
 {
- 
-  typedef samlib::environment<samlib::base_state> state_t;
+  typedef samlib::environment<samlib::base_state> env_t;
 
-  state_t st;
+  env_t st;
+  env_t::agent_ref_type<size_t> p1,p2;
 
-  auto& p1 = st.make_agent<size_t,size_t>(samlib::generator(gen));
-  auto& p2 = st.make_agent<size_t>(samlib::sink(hole));
-
-  p1.set_outputs(p2);
+  p1 = st.make_agent<size_t>(samlib::generator(gen,p2));
+  p2 = st.make_agent<size_t>(samlib::sink(hole));
 
   st.start_agents();
 

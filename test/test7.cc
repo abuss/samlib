@@ -35,15 +35,14 @@ payload pong(payload val)
 int main()
 {
  
-  typedef samlib::environment<samlib::base_state> state_t;
+  typedef samlib::environment<samlib::base_state> env_t;
   
-  state_t st;
+  env_t st;
 
-  auto& p1 = st.make_agent<payload,payload>(samlib::transform(ping));
-  auto& p2 = st.make_agent<payload,payload>(samlib::transform(pong));
+  env_t::agent_ref_type<payload> p1,p2;
 
-  p1.set_outputs(p2);
-  p2.set_outputs(p1);
+  p1 = st.make_agent<payload>(samlib::transform(ping,p2));
+  p2 = st.make_agent<payload>(samlib::transform(pong,p1));
 
   st.start_agents();
 

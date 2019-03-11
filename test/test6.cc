@@ -8,19 +8,19 @@
 #include <samlib/environment.hpp>
 
 
-auto my_generator = [](auto fn)
+auto my_generator = [](auto fn, auto& out)
 {
   // size_t ngen = 0;
   using namespace std::literals::chrono_literals; 
 
-  return [fn](auto& gstate, auto& lstate, auto& in_port, auto& out_ports) {
+  return [fn,&out](auto& gstate, auto& lstate, auto& in_port) {
     lstate.sum = 0;
     if (auto dat = in_port.try_receive()) {
       auto n = *dat;
       while ((n > 0) && (!gstate.terminate)) {
         auto val = fn(n);
         lstate.sum += val;
-        samlib::send_to<0>(out_ports, val);
+        out.send(val);
         --n;
       }
       printf("Sum: %lu\n",lstate.sum);
@@ -46,16 +46,17 @@ size_t gen(size_t val)
 int main()
 {
  
-  typedef samlib::environment<samlib::base_state> state_t;
+  typedef samlib::environment<samlib::base_state> env_t;
 
-  struct { size_t sum=0; } lst;
+  struct local_state { size_t sum=0; } lst;
 
-  state_t st;
+  env_t st;
 
-  auto& p1 = st.make_agent<size_t,size_t>(lst, my_generator(gen));
-  auto& p2 = st.make_agent<size_t>(samlib::sink(hole));
+  env_t::agent_ref_type<size_t, local_state> p1;
+  env_t::agent_ref_type<size_t> p2;
 
-  p1.set_outputs(p2);
+  p1 = st.make_agent<size_t>(lst, my_generator(gen,p2),1);
+  p2 = st.make_agent<size_t>(samlib::sink(hole));
 
   st.start_agents();
 

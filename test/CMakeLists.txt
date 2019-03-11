@@ -20,5 +20,5 @@ ADD_SAMLIB_TEST(test6 test6.cc)
 ADD_SAMLIB_TEST(test7 test7.cc)
 ADD_SAMLIB_TEST(test8 test8.cc)
 ADD_SAMLIB_TEST(test9 test9.cc)
-ADD_SAMLIB_TEST(test_ports test_ports.cc)
-# ADD_SAMLIB_TEST(test_ports2 test_ports2.cc)
+
+ADD_SAMLIB_TEST(lock_free_queue lock_free_queue.cc)

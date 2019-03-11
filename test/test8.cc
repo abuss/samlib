@@ -4,6 +4,7 @@
 #include <tuple>
 
 #include <samlib/agent.hpp>
+#include <samlib/agent_ref.hpp>
 #include <samlib/tasks.hpp>
 #include <samlib/environment.hpp>
 
@@ -20,17 +21,15 @@ auto fn_factory(std::string name)
 int main()
 {
  
-  typedef samlib::environment<samlib::base_state> state_t;
+  typedef samlib::environment<samlib::base_state> env_t;
   
-  state_t st;
+  env_t st;
 
-  auto& p1 = st.make_agent<size_t,size_t>(samlib::transform(fn_factory("Hugo")));
-  auto& p2 = st.make_agent<size_t,size_t>(samlib::transform(fn_factory("Paco")));
-  auto& p3 = st.make_agent<size_t,size_t>(samlib::transform(fn_factory("Luis")));
+  env_t::agent_ref_type<size_t> p1,p2,p3;
 
-  p1.set_outputs(p2);
-  p2.set_outputs(p3);
-  p3.set_outputs(p1);
+  p1 = st.make_agent<size_t>(samlib::transform(fn_factory("Hugo"),p2));
+  p2 = st.make_agent<size_t>(samlib::transform(fn_factory("Paco"),p3));
+  p3 = st.make_agent<size_t>(samlib::transform(fn_factory("Luis"),p1));
 
   st.start_agents();
 

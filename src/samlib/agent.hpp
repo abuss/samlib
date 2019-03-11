@@ -1,7 +1,6 @@
 #pragma once
 
 #include <samlib/base.hpp>
-#include <samlib/ports.hpp>
 #include <samlib/mailbox.hpp>
 
 namespace samlib
@@ -9,8 +8,10 @@ namespace samlib
 
 struct empty_state {};
 
+template <typename A>
+class agent_ref;
 
-template <typename GState, typename LState, typename Tin, typename... Tout>
+template <typename GState, typename LState, typename Tin>
 class agent
     : public base<Tin>
 {
@@ -18,15 +19,14 @@ protected:
   using base_t = base<Tin>;
   using global_state_t = GState;
   using local_state_t = LState;
-  using ports_t = ports<mailbox<Tout> *...>;
-  using task_t = std::function<void(global_state_t&, local_state_t&, mailbox<Tin> &, ports_t &)>;
+  using task_t = std::function<void(global_state_t&, local_state_t&, mailbox<Tin> &)>;
 
   global_state_t *global_state;
   local_state_t local_state;
-  ports_t outputs;
   task_t task;
 
 public:
+  using agent_ref_type = agent_ref<agent>;
 
   constexpr agent(global_state_t &gstate)
       : global_state{&gstate}
@@ -48,20 +48,20 @@ public:
         task{fn}
   { }
 
-  template <typename... Ps>
-  constexpr agent &set_outputs(Ps &... ps)
-  {
-    outputs = make_ports(&ps.mbox()...);
-    return *this;
-  }
-
   void run()
   {
     while (!global_state->terminate)
     {
-      task(*global_state, local_state, this->mbox(), outputs);
+      task(*global_state, local_state, this->mbox());
     }
   }
+
+  agent_ref_type ref()
+  {
+    return agent_ref_type(this);
+  }
+
 };
+
 
 } // namespace samlib
