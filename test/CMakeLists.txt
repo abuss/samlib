@@ -20,5 +20,7 @@ ADD_SAMLIB_TEST(test6 test6.cc)
 ADD_SAMLIB_TEST(test7 test7.cc)
 ADD_SAMLIB_TEST(test8 test8.cc)
 ADD_SAMLIB_TEST(test9 test9.cc)
+ADD_SAMLIB_TEST(test10 test10.cc)
 
 ADD_SAMLIB_TEST(lock_free_queue lock_free_queue.cc)
+target_link_libraries(lock_free_queue PRIVATE ${COMMON_LINK_LIBS} ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_CXX_LINK_FLAGS})
