@@ -11,7 +11,7 @@
 namespace samlib
 {
 
-  struct empty_state;
+  //struct empty_state;
 
   struct base_state {
     bool terminate = false;
@@ -23,7 +23,7 @@ namespace samlib
 */
   template<typename Env>
   class environment
-          : public base_state
+          : public Env //base_state
   {
     struct agent_def {
       samlib::executor* executor;
@@ -51,13 +51,14 @@ namespace samlib
       }
     }
 
-    template <typename In, typename LState=empty_state>
-    using agent_ref_type = agent_ref<agent<Env, LState, In>>;
+    template <typename In>
+    using agent_ref_type = agent_ref<agent<Env, In>>;
+
 
     template <typename In, typename Fn>
     agent_ref_type<In> make_agent(Fn&& fn, u_int nworkers=1)
     {
-      typedef agent<Env, empty_state, In> agent_t;
+      typedef agent<Env, In> agent_t;
       agent_t* ptr =  new agent_t(*static_cast<Env*>(this), fn);
       agents.push_back(agent_def{ptr, nworkers, true});
       if (autostart_agents)
@@ -66,29 +67,17 @@ namespace samlib
     }
 
 
-    // Make an agent with local state
-    template <typename In, typename LS, typename Fn>
-    agent_ref_type<In,LS> make_agent(LS ls, Fn&& fn, u_int nworkers)
+    template<typename A, typename... Args>
+    typename A::agent_ref_type create_agent(Args... args)
     {
-      typedef agent<Env, LS, In>                agent_t;
-      typedef typename agent_t::agent_ref_type  agent_ref_t;
-      agent_t* ptr =  new agent_t(*static_cast<Env*>(this), ls, fn);
-      agents.push_back(agent_def{ptr, nworkers, true});
+      typedef typename A::agent_ref_type agent_ref_t;
+      A* ptr = new A(*static_cast<Env*>(this), args...);
+      agents.push_back(agent_def{ptr, 1, true});
       if (autostart_agents)
-        ptr->start(nworkers);
+        ptr->start(1);
       return agent_ref_t(ptr);
     }
 
-
-    /*
-    template<typename A, typename... Args>
-    A& create_agent(Args... args)
-    {
-      A* ptr = new A(*static_cast<Env*>(this), args...);
-      agents.push_back(agent_def{ptr, 1, true});
-      return *ptr;
-    }
-  */
 
     void start_agents()
     {

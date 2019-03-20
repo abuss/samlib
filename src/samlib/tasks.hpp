@@ -10,7 +10,7 @@ namespace samlib
   template<typename Fn, typename O>
   auto transform(Fn fn, const O& out)
   {
-    return [fn,&out](auto& state, auto, auto& in_port) {
+    return [fn,&out](auto& state, auto& in_port) {
         if (auto data = in_port.try_receive()) {
           out.send(fn(std::move(*data)));
         }
@@ -26,7 +26,7 @@ namespace samlib
   {
     // size_t ngen = 0;
 
-    return [fn,&out](auto& state, auto, auto& in_port) {
+    return [fn,&out](auto& state, auto& in_port) {
         if (auto dat = in_port.try_receive()) {
           auto n = *dat;
           while ((n > 0) && (!state.terminate)) {
@@ -45,7 +45,7 @@ namespace samlib
 
   auto sink = [](auto fn)
   {
-      return [fn](auto& state, auto, auto& in_port) {
+      return [fn](auto& state, auto& in_port) {
           if (auto data = in_port.try_receive())
             fn(*data);
           else
@@ -57,7 +57,7 @@ namespace samlib
   template<typename... O>
   auto splitter(const O&... outs)
   {
-    return [&](auto, auto, auto& in_port) {
+    return [&](auto, auto& in_port) {
         if (auto data = in_port.try_receive()) {
           for (auto out : {outs...})
             out.send(*data);

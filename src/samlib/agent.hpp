@@ -11,18 +11,16 @@ struct empty_state {};
 template <typename A>
 class agent_ref;
 
-template <typename GState, typename LState, typename Tin>
+template <typename GState, typename Tin>
 class agent
     : public base<Tin>
 {
 protected:
   using base_t = base<Tin>;
   using global_state_t = GState;
-  using local_state_t = LState;
-  using task_t = std::function<void(global_state_t&, local_state_t&, mailbox<Tin> &)>;
+  using task_t = std::function<void(global_state_t&, mailbox<Tin> &)>;
 
   global_state_t *global_state;
-  local_state_t local_state;
   task_t task;
 
 public:
@@ -37,22 +35,11 @@ public:
         task{fn}
   { }
 
-  constexpr agent(global_state_t &gstate, local_state_t lstate)
-      : global_state{&gstate},
-        local_state{lstate}
-  { }
-
-  constexpr agent(global_state_t &gstate, local_state_t lstate, task_t &&fn)
-      : global_state{&gstate},
-        local_state{lstate},
-        task{fn}
-  { }
-
   void run()
   {
     while (!global_state->terminate)
     {
-      task(*global_state, local_state, this->mbox());
+      task(*global_state, this->mbox());
     }
   }
 

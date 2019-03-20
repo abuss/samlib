@@ -8,11 +8,11 @@
 
 template<typename GS, typename Tin, typename Tout=Tin>
 struct ping_pong_agent
-  : public samlib::agent<GS,samlib::empty_state,Tin>
+  : public samlib::agent<GS,Tin>
 {
-  typedef samlib::agent<GS,samlib::empty_state,Tin>     base_t;
-  typedef std::function<Tout(Tin)>                      task_t;
-  typedef samlib::agent_ref<ping_pong_agent>            agent_ref_type;
+  typedef samlib::agent<GS,Tin>                    base_t;
+  typedef std::function<Tout(Tin)>                 task_t;
+  typedef samlib::agent_ref<ping_pong_agent>       agent_ref_type;
 
   typedef samlib::agent_ref<ping_pong_agent<GS,Tin,Tout>> dest_agent_t;
 

@@ -12,6 +12,7 @@ namespace samlib
     agent_t* ptr;
 
   public:
+
     constexpr agent_ref()
       : ptr(nullptr)
     { }
@@ -21,7 +22,7 @@ namespace samlib
     { }
 
     agent_ref(const agent_ref& other)
-            : ptr(other.ptr)
+      : ptr(other.ptr)
     { }
 
     agent_ref& operator=(const agent_ref& other)
@@ -31,13 +32,13 @@ namespace samlib
     }
 
     template<typename T>
-    bool send(const T& value) const
+    constexpr bool send(const T& value) const
     {
       return ptr->send(value);
     }
 
     template<typename T>
-    bool send(T&& value) const
+    constexpr bool send(T&& value) const
     {
       return ptr->send(value);
     }

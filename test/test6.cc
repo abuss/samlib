@@ -12,18 +12,19 @@ auto my_generator = [](auto fn, auto& out)
 {
   // size_t ngen = 0;
   using namespace std::literals::chrono_literals; 
+  size_t sum = 0;
 
-  return [fn,&out](auto& gstate, auto& lstate, auto& in_port) {
-    lstate.sum = 0;
+  return [fn,&out,&sum](auto& gstate, auto& in_port) {
+    sum = 0;
     if (auto dat = in_port.try_receive()) {
       auto n = *dat;
       while ((n > 0) && (!gstate.terminate)) {
         auto val = fn(n);
-        lstate.sum += val;
+        sum += val;
         out.send(val);
         --n;
       }
-      printf("Sum: %lu\n",lstate.sum);
+      printf("Sum: %lu\n",sum);
     }
     else {
       std::this_thread::sleep_for(1us);
@@ -52,10 +53,10 @@ int main()
 
   env_t st;
 
-  env_t::agent_ref_type<size_t, local_state> p1;
+  env_t::agent_ref_type<size_t> p1;
   env_t::agent_ref_type<size_t> p2;
 
-  p1 = st.make_agent<size_t>(lst, my_generator(gen,p2),1);
+  p1 = st.make_agent<size_t>(my_generator(gen,p2),1);
   p2 = st.make_agent<size_t>(samlib::sink(hole));
 
   st.start_agents();
