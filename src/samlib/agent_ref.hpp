@@ -53,6 +53,10 @@ namespace samlib
       ptr->wait();
     }
 
+    agent_t& ref_agent() const
+    {
+      return *ptr;
+    }
   };
 
 }

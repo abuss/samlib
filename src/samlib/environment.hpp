@@ -11,8 +11,6 @@
 namespace samlib
 {
 
-  //struct empty_state;
-
   struct base_state {
     bool terminate = false;
   };
