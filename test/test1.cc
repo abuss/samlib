@@ -2,59 +2,52 @@
 #include <iostream>
 #include <samlib/base.hpp>
 
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
 
-struct my_agent
-  : public samlib::base<double>
-{
-  void run()
+
+TEST_CASE("testing mailbox") {
+
+  samlib::mailbox<double> mout;
+
+  CHECK(mout.size_approx() == 0);
+
+  mout.send(3.14);
+
+  CHECK(mout.size_approx() == 1);
+
+  CHECK(mout.receive() == 3.14);
+  CHECK(mout.size_approx() == 0);
+}
+
+TEST_CASE("testing mailbox's agent") {
+
+  struct my_agent
+    : public samlib::base<double>
   {
-    std::cout << "Hello World\n";
-    auto dat = this->try_receive();
-    if (dat)
-      std::cout << "REceived: " << dat.value_or(0.0) << std::endl;
-    else
-      std::cout << "Nothing\n";
-    auto dat2 = this->receive();
-    if (dat2)
-      std::cout << "REceived: " << dat2 << std::endl;
-    else
-      std::cout << "Nothing\n";
-  }
-};
+    void run()
+    {
+      auto dat = this->try_receive();
+      CHECK(dat == std::nullopt);
+     
+      dat = this->receive();
+      CHECK(dat == 1.234);
 
-struct generator
-{
-  int n;
+      dat = this->try_receive();
+      CHECK(dat == 5.67);
 
-  generator(int _n)
-    : n(_n)
-  { }
+      dat = this->try_receive();
+      CHECK(dat == std::nullopt);
+    }
+  };
 
-  std::optional<double> operator()()
-  {
-    if (n>0)
-      return n--*2.3;
-    return std::nullopt;
-  }
-};
-
-int main()
-{
-  std::cout << "Hello, from samlib!\n";
   my_agent a;
   a.start();
   sleep(1);
-  a.send(3.124);
+  a.send(1.234);
+  a.send(5.67);
   sleep(1);
   a.wait();
 
-  generator g(10);
-  std::cout << *g() << std::endl;
-  std::cout << *g() << std::endl;
-  std::cout << *g() << std::endl;
-
-  struct state{ bool terminate; };
-  // state st;
-  samlib::mailbox<double> mout;
-  return 0;
+  CHECK(true);
 }

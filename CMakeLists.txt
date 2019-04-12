@@ -13,7 +13,8 @@ message("*")
 
 option(BUILD_TESTS "Build tests" ON)
 option(BUILD_DOCS "Build documentation" ON)
-# option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_PYTHON_BINDING "Build python binding" ON)
+option(BUILD_EXAMPLES "Build examples" ON)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -36,22 +37,30 @@ elseif(NOT OPENMP_FOUND)
     message(FATAL_ERROR "Can't find Thread support.")
 endif()
 
+# find_library(Atomic-lib atomic)
+set(CMAKE_CXX_LINK_FLAGS "-latomic")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "C++17 support has been enabled by default.")
 
-# include(CTest)
-# enable_testing()
+include(CTest)
+enable_testing()
 
 # Tests
 if ((BUILD_TESTS) OR (NOT CMAKE_BUILD_TYPE MATCHES "RELEASE"))
   add_subdirectory(test)
 endif()
 
+# Python binding
+if (BUILD_PYTHON_BINDING)
+  add_subdirectory(python)
+endif()
+
 # Examples
-#if (BUILD_EXAMPLES)
-#  add_subdirectory(doc/src/examples)
-#endif()
+if (BUILD_EXAMPLES)
+ add_subdirectory(examples)
+endif()
 
 
 # if (BUILD_DOCS)
@@ -93,6 +102,7 @@ message(STATUS "CXX:            " ${CMAKE_CXX_COMPILER})
 message(STATUS "CXX_ID:         " ${CMAKE_CXX_COMPILER_ID})
 message(STATUS "CXXFLAGS:       " ${CMAKE_CXX_FLAGS} " " ${CMAKE_CXX_FLAGS_${BUILD_TYPE_SUFFIX}})
 message(STATUS "CXX_LINK_FLAGS: " ${CMAKE_THREAD_LIBS_INIT})
+message(STATUS "CXX_LINK_FLAGS: " ${CMAKE_CXX_LINK_FLAGS})
 message(STATUS "Verbose:        " ${CMAKE_VERBOSE_MAKEFILE})
 message(STATUS "")
 message(STATUS "++ Lib Info")
