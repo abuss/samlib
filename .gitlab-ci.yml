@@ -24,9 +24,9 @@ build:
   #   paths:
   #     - "*.o"
 
-# run tests using the binary built before
-test:
-  stage: test
-  script:
-    - make test
-    - ./examples/test4_2
+# # run tests using the binary built before
+# test:
+#   stage: test
+#   script:
+#     - make test
+#     - ./examples/test4_2
