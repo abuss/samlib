@@ -17,8 +17,8 @@ build:
     - make test
   artifacts:
    paths:
-     - test/test1
-     - examples/* 
+     - build/test/test1
+     - build/examples/* 
   # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
   # cache:
   #   paths:
