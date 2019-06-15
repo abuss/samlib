@@ -16,19 +16,14 @@ auto my_generator = [](auto fn, auto& out)
 
   return [fn,&out,&sum](auto& gstate, auto& in_port) {
     sum = 0;
-    if (auto dat = in_port.try_receive()) {
-      auto n = *dat;
-      while ((n > 0) && (!gstate.terminate)) {
-        auto val = fn(n);
-        sum += val;
-        out.send(val);
-        --n;
-      }
-      printf("Sum: %lu\n",sum);
+    auto n = in_port.receive(); 
+    while ((n > 0) && (!gstate.terminate)) {
+      auto val = fn(n);
+      sum += val;
+      out.send(val);
+      --n;
     }
-    else {
-      std::this_thread::sleep_for(1us);
-    }
+    printf("Sum: %lu\n",sum);
   };
 };
 
@@ -61,12 +56,13 @@ int main()
 
   st.start_agents();
 
-  p1.send(10);
+  p1.send(1000000);
 
-  sleep(5);
+  sleep(1);
 
   printf("------------ Time's up ---------------\n");
-  
+
+  // st.stop_agents();
   st.wait_agents();
 
 }

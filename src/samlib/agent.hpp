@@ -13,7 +13,7 @@ class agent_ref;
 
 template <typename GState, typename Tin>
 class agent
-    : public base<Tin>
+  : public base<Tin>
 {
 protected:
   using base_t = base<Tin>;
@@ -41,6 +41,7 @@ public:
     {
       task(*global_state, this->mbox());
     }
+    this->stop();
   }
 
   agent_ref_type ref()

@@ -10,62 +10,39 @@ namespace samlib
   template<typename Fn, typename O>
   auto transform(Fn fn, const O& out)
   {
-    return [fn,&out](auto& state, auto& in_port) {
-        if (auto data = in_port.try_receive()) {
-          out.send(fn(std::move(*data)));
-        }
-        else {
-          std::this_thread::yield();
-        }
-    };
-  };
+    return [fn,&out](auto&, auto& in_port) {
+              out.send(fn(in_port.receive()));
+            };
+  }
 
 
   template<typename Fn, typename O>
   auto generator(Fn fn, const O& out)
   {
-    // size_t ngen = 0;
-
     return [fn,&out](auto& state, auto& in_port) {
-        if (auto dat = in_port.try_receive()) {
-          auto n = *dat;
-          while ((n > 0) && (!state.terminate)) {
-            out.send(fn(n));
-            // global.ngen += 1;
-            // ++ngen;
-            --n;
-          }
-        }
-        else {
-          std::this_thread::sleep_for(20ms);
-        }
-    };
-  };
+              auto n = in_port.receive();
+              while ((n > 0) && (!state.terminate)) {
+                out.send(fn(n));
+                --n;
+              }
+            };
+  }
 
 
-  auto sink = [](auto fn)
-  {
-      return [fn](auto& state, auto& in_port) {
-          if (auto data = in_port.try_receive())
-            fn(*data);
-          else
-            std::this_thread::yield();
-      };
-  };
+  auto sink = [](auto fn) {
+    return [fn](auto&, auto& in_port) {
+              fn(in_port.receive());
+            };
+          };
 
 
   template<typename... O>
-  auto splitter(const O&... outs)
-  {
+  auto splitter(const O&... outs) {
     return [&](auto, auto& in_port) {
-        if (auto data = in_port.try_receive()) {
-          for (auto out : {outs...})
-            out.send(*data);
-        }
-        else {
-          std::this_thread::yield();
-        }
-    };
-  };
+              auto data = in_port.receive();
+              for (auto out : {outs...})
+                out.send(data);
+          };
+  }
 
-}; // namespace samlib
+} // namespace samlib

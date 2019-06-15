@@ -34,7 +34,7 @@ int main()
 
   p1.send(10000);
 
-  sleep(3);
+  sleep(1);
   
   printf("------------ Time's up ---------------\n");
   st.wait_agents();

@@ -21,7 +21,7 @@ namespace samlib
 */
   template<typename Env>
   class environment
-          : public Env //base_state
+    : public Env
   {
     struct agent_def {
       samlib::executor* executor;
@@ -57,7 +57,7 @@ namespace samlib
     agent_ref_type<In> make_agent(Fn&& fn, u_int nworkers=1)
     {
       typedef agent<Env, In> agent_t;
-      agent_t* ptr =  new agent_t(*static_cast<Env*>(this), fn);
+      agent_t* ptr = new agent_t(*static_cast<Env*>(this), fn);
       agents.push_back(agent_def{ptr, nworkers, true});
       if (autostart_agents)
         ptr->start(nworkers);
@@ -94,6 +94,8 @@ namespace samlib
     void stop_agents()
     {
       this->terminate = true;
+      for(auto& a : agents)
+        reinterpret_cast<base<int>*>(a.executor)->stop();
     }
   };
 

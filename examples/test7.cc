@@ -14,20 +14,26 @@ struct payload
   std::vector<size_t> data;
   size_t n=0;
 
-  payload() : data{1000}, n(0) {}
+  payload(size_t sz) : data(sz), n(0) {}
+
+  payload() : n(0) {}
+
+  bool is_valid() const { return !data.empty(); }
 };
 
 payload ping(payload val)
 {
   val.n++;
-  printf("Ping -> %lu (%lu)\n", ++val.data[0],val.n);
+  if (val.is_valid())
+    printf("Ping -> %lu (%lu)\n", ++val.data[0],val.n);
   return val;
 }
 
 payload pong(payload val)
 {
   val.n++;
-  printf("%lu (%lu) <- Pong\n", ++val.data[1], val.n);
+  if (val.is_valid())
+    printf("%lu (%lu) <- Pong\n", ++val.data[1], val.n);
   return val;
 }
 
@@ -46,7 +52,7 @@ int main()
 
   st.start_agents();
 
-  payload vec; //{1000};
+  payload vec(1000); //{1000};
 
   sleep(1);
 

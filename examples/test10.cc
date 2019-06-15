@@ -28,12 +28,16 @@ vect_t generate(size_t)
 
 out_t min_value(const vect_t& data)
 {
-  return out_t("Min",*std::min_element(data.begin(),data.end()));
+  if (!data.empty())
+    return out_t("Min",*std::min_element(data.begin(),data.end()));
+  return out_t("Done",0);
 }
 
 out_t max_value(const vect_t& data)
 {
-  return out_t("Max",*std::max_element(data.begin(),data.end()));
+  if (!data.empty())
+    return out_t("Max",*std::max_element(data.begin(),data.end()));
+  return out_t("Done",0);
 }
 
 template<typename T>

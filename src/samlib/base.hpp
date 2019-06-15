@@ -42,7 +42,7 @@ namespace samlib
 
   template <typename T>
   class base
-          : public executor
+    : public executor
   {
     typedef mailbox<T>  mailbox_type;
 
@@ -61,6 +61,16 @@ namespace samlib
     }
 
   public:
+
+    ~base() {
+      stop();
+    }
+
+    void stop()
+    {
+      _mbox.close();
+    }
+
     mailbox_type& mbox()
     {
       return _mbox;
