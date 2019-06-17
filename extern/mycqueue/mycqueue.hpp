@@ -8,16 +8,16 @@
 template<typename T>
 class mycqueue
 {
-  using state_t = std::atomic<uint8_t>;
+  using turns_t = std::atomic<size_t>;
 
   static constexpr size_t cache_line_size = 64;
   const size_t capacity;
   bool closed = false;
-  state_t* state = nullptr;
+  turns_t* turns = nullptr;
   T* elements = nullptr;
 
-  const uint8_t USED = 1;
-  const uint8_t UNUSED = 0;
+  // const uint8_t USED = 1;
+  // const uint8_t UNUSED = 0;
 
 
 protected:
@@ -30,14 +30,14 @@ public:
     : capacity{capacity_}
   { 
     closed = false;
-    state = new(std::align_val_t{cache_line_size}) state_t[capacity];
+    turns = new(std::align_val_t{cache_line_size}) turns_t[capacity];
     elements = new(std::align_val_t{alignof(T)}) T[capacity];
   }
 
   ~mycqueue()
   {
     closed = true;
-    delete [] state;
+    delete [] turns;
     delete [] elements;
   }
 
@@ -46,12 +46,12 @@ public:
   { 
     auto const head_ = head.fetch_add(1);
     auto idx = index(head_);
-    while (state[idx].load(std::memory_order_acquire) != UNUSED) {
+    while (turns[idx].load(std::memory_order_acquire) != turn(head_)*2) {
       if (closed) return;
       // _mm_pause();
     }
     elements[idx] = std::move(value);
-    state[idx].store(USED, std::memory_order_release);
+    turns[idx].store(turn(head_)*2+1, std::memory_order_release);
   }
 
 
@@ -66,7 +66,7 @@ public:
               std::memory_order_acquire, std::memory_order_relaxed));
     auto idx = index(head_);
     elements[idx] = std::move(value);
-    state[idx].store(USED, std::memory_order_relaxed);
+    turns[idx].store(turn(head_)*2+1, std::memory_order_relaxed);
     return true;
   }
 
@@ -75,14 +75,14 @@ public:
   { 
     auto const tail_ = tail.fetch_add(1);
     auto idx = index(tail_);
-    while (state[idx].load(std::memory_order_acquire) != USED) {
+    while (turns[idx].load(std::memory_order_acquire) != turn(tail_)*2+1) {
       if (closed) {
         value = std::move(elements[idx]);    
         return;
       }
     }
     value = std::move(elements[idx]);
-    state[idx].store(UNUSED, std::memory_order_release);
+    turns[idx].store(turn(tail_)*2+2, std::memory_order_release);
   }
 
 
@@ -90,14 +90,14 @@ public:
   { 
     auto const tail_ = tail.fetch_add(1);
     auto idx = index(tail_);
-    while (state[idx].load(std::memory_order_acquire) != USED) {
+    while (turns[idx].load(std::memory_order_acquire) != turn(tail_)*2+1) {
       if (closed) { 
         return elements[idx];
       }
       // _mm_pause();
     }
     T v = std::move(elements[idx]);
-    state[idx].store(UNUSED, std::memory_order_release);
+    turns[idx].store(turn(tail_)*2+2, std::memory_order_release);
     return v;
   }
 
@@ -113,7 +113,7 @@ public:
               std::memory_order_acquire, std::memory_order_relaxed));
     auto idx = index(tail_);
     value = std::move(elements[idx]);
-    state[idx].store(UNUSED, std::memory_order_relaxed);
+    turns[idx].store(turn(tail_)*2+2, std::memory_order_relaxed);
     return true;
   }
 

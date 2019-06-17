@@ -33,6 +33,7 @@ add_subdirectory(extern)
 
 include_directories(samlib INTERFACE src)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQUEUE_IMPLEMENTATION_${QUEUE_IMPLEMENTATION}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -pedantic")
 
