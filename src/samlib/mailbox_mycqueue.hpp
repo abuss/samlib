@@ -20,8 +20,8 @@ namespace samlib
 
   public:
 
-    mailbox()
-      : base_t(8)
+    mailbox(size_t capacity_=64)
+      : base_t(capacity_)
     { }
 
     size_t size_approx() const
@@ -46,9 +46,6 @@ namespace samlib
     value_type receive()
     {
       return this->pop();
-      // value_type value;
-      // this->pop(value);
-      // return value;
     }
     
     std::optional<value_type> try_receive()
