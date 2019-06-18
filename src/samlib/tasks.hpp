@@ -11,8 +11,13 @@ namespace samlib
   auto transform(Fn fn, const O& out)
   {
     return [fn,&out](auto&, auto& in_port) {
-              out.send(fn(in_port.receive()));
-            };
+        if (auto data = in_port.try_receive()) {
+          out.send(fn(std::move(*data)));
+        }
+        // else {
+          // std::this_thread::yield();
+        // }
+    };
   }
 
 
@@ -20,29 +25,45 @@ namespace samlib
   auto generator(Fn fn, const O& out)
   {
     return [fn,&out](auto& state, auto& in_port) {
-              auto n = in_port.receive();
-              while ((n > 0) && (!state.terminate)) {
-                out.send(fn(n));
-                --n;
-              }
-            };
+        if (auto dat = in_port.try_receive()) {
+          auto n = *dat;
+          while ((n > 0) && (!state.terminate)) {
+            out.send(fn(n));
+            // global.ngen += 1;
+            // ++ngen;
+            --n;
+          }
+        }
+        // else {
+          // std::this_thread::sleep_for(20ms);
+        // }
+    };
   }
 
 
-  auto sink = [](auto fn) {
-    return [fn](auto&, auto& in_port) {
-              fn(in_port.receive());
-            };
-          };
+  auto sink = [](auto fn)
+  {
+      return [fn](auto&, auto& in_port) {
+          if (auto data = in_port.try_receive())
+            fn(*data);
+          // else
+            // std::this_thread::yield();
+      };
+  };
 
 
   template<typename... O>
-  auto splitter(const O&... outs) {
+  auto splitter(const O&... outs)
+  {
     return [&](auto, auto& in_port) {
-              auto data = in_port.receive();
-              for (auto out : {outs...})
-                out.send(data);
-          };
+        if (auto data = in_port.try_receive()) {
+          for (auto out : {outs...})
+            out.send(*data);
+        }
+        // else {
+          // std::this_thread::yield();
+        // }
+    };
   }
 
 } // namespace samlib
