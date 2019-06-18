@@ -47,6 +47,7 @@ TEST_CASE("testing mailbox's agent") {
   a.send(1.234);
   a.send(5.67);
   sleep(1);
+  a.stop();
   a.wait();
 
   CHECK(true);
