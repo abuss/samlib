@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <iostream>
 #include <samlib/base.hpp>
+#include <samlib/mailbox.hpp>
+#include <samlib/environment.hpp>
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
@@ -20,11 +22,16 @@ TEST_CASE("testing mailbox") {
   CHECK(mout.size_approx() == 0);
 }
 
+
 TEST_CASE("testing mailbox's agent") {
 
   struct my_agent
     : public samlib::base<double>
   {
+    using agent_ref_type = samlib::agent_ref<my_agent>;
+
+    my_agent(samlib::base_state&) {};
+
     void run()
     {
       auto dat = this->try_receive();
@@ -41,14 +48,18 @@ TEST_CASE("testing mailbox's agent") {
     }
   };
 
-  my_agent a;
-  a.start();
+  typedef samlib::environment<samlib::base_state> env_t;
+
+  env_t st;
+
+  auto a = st.create_agent<my_agent>();
+
+  st.start_agents();
   sleep(1);
   a.send(1.234);
   a.send(5.67);
   sleep(1);
-  a.stop();
-  a.wait();
+  st.wait_agents();
 
   CHECK(true);
 }
