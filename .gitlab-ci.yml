@@ -27,5 +27,5 @@ test:
      - build/test/test1
      - build/examples/* 
   script:
-    - ./examples/test4_2
-    - make test
+    - build/examples/test4_2
+    - build/test/test1
