@@ -45,5 +45,5 @@ int main()
   // p1.stop();
   // p2.stop();
 
-  st.wait_agents();
+  st.stop_agents();
 }

@@ -32,7 +32,7 @@ TEST_CASE("testing mailbox's agent") {
 
     my_agent(samlib::base_state&) {};
 
-    void run()
+    void run(std::stop_token)
     {
       auto dat = this->try_receive();
       CHECK(dat == std::nullopt);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <thread>
+#include <jthread.hpp>
 #include <functional>
 
 #include <samlib/mailbox.hpp>
@@ -10,18 +10,18 @@ namespace samlib
 
   class executor
   {
-    std::vector<std::thread>   executor_threads;
+    std::vector<std::jthread>   executor_threads;
 
   public:
 
     virtual ~executor() {}
 
-    virtual void run() = 0;
+    virtual void run(std::stop_token) = 0;
 
     void start(u_int n=1)
     {
       for (u_int i=0;i<n;++i)
-        executor_threads.emplace_back(std::thread([&] { run(); }));
+        executor_threads.emplace_back(std::jthread([&](std::stop_token st) { run(st); }));
     }
 
     void wait()
@@ -29,6 +29,12 @@ namespace samlib
       for (auto& thrd : executor_threads)
         if (thrd.joinable())
           thrd.join();
+    }
+
+    void stop()
+    {
+      for (auto& thrd : executor_threads)        
+        thrd.request_stop();
     }
 
     void detach()
@@ -69,6 +75,7 @@ namespace samlib
     void stop()
     {
       _mbox.close();
+      executor::stop();
     }
 
     mailbox_type& mbox()

@@ -29,9 +29,9 @@ struct ping_pong_agent
     mbox_output = &mb_out;
   }
 
-  void run()
+  void run(std::stop_token st)
   {
-    while (!global_state->terminate) {
+    while (!st.stop_requested()) {
       auto data = this->receive();
       auto new_data = producer(data);
       mbox_output->send(*new_data);

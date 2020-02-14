@@ -1,15 +1,13 @@
-// Mailbox implementation using queues
+// Mailbox adapter to use MPMCqueue
 #pragma once
 
 #include <iostream>
 #include <optional>
 #include <chrono>
 
-// #include "atomic_queue.h"
 #include <include/rigtorp/MPMCQueue.h>
 
 
-  
 namespace samlib
 {
  

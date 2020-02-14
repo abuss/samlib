@@ -1,4 +1,5 @@
-// Mailbox implementation using queues
+// Mailbox adapter using mucqueue
+
 #pragma once
 
 #include <iostream>

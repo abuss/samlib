@@ -40,6 +40,7 @@ namespace samlib
 
     ~environment()
     {
+      stop_agents();
       wait_agents();
       for(auto& a : agents) {
         if (a.executor!=nullptr && a.destroy) {
@@ -95,7 +96,7 @@ namespace samlib
     {
       this->terminate = true;
       for(auto& a : agents)
-        reinterpret_cast<base<int>*>(a.executor)->stop();
+        a.executor->stop();
     }
   };
 

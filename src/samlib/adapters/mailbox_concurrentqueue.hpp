@@ -1,67 +1,27 @@
-// Mailbox implementation using queues
+// Mailbox adapter to use moodycamel::concurrentqueue
 #pragma once
 
 #include <iostream>
 #include <optional>
 #include <chrono>
 
-#ifndef NO_CONCURRENT_QUEUE
 #include "concurrentqueue.h"
-#else
-#include <queue>
-#endif
 
 namespace samlib
 {
  
   template<typename T>
   class mailbox
-#ifndef NO_CONCURRENT_QUEUE
     : moodycamel::ConcurrentQueue<T>
-#else
-    : std::queue<T>
-#endif
   {
   public:
 
     typedef T value_type;
-
-#ifndef NO_CONCURRENT_QUEUE
     
     using moodycamel::ConcurrentQueue<T>::ConcurrentQueue;
     using moodycamel::ConcurrentQueue<T>::enqueue;
     using moodycamel::ConcurrentQueue<T>::try_dequeue;
     using moodycamel::ConcurrentQueue<T>::size_approx;
-
-#else
-
-    using std::queue<T>::queue;
-
-    bool enqueue(T const& value)
-    {
-      this->emplace(value);
-      return true;
-    }
-
-
-    bool try_dequeue(T& value)
-    {
-      value = T();
-      if (!this->empty()) {
-        value = this->front();
-        this->pop();
-        return true;
-      }
-      return false;
-    }
-
-
-    size_t size_approx() const
-    {
-      return this->size();
-    }
-
-#endif
 
 
     bool send(const value_type& value)

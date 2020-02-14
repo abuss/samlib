@@ -53,6 +53,11 @@ namespace samlib
       ptr->wait();
     }
 
+    void stop() const
+    {
+      ptr->stop();
+    }
+
     agent_t& ref_agent() const
     {
       return *ptr;

@@ -41,5 +41,5 @@ int main()
   sleep(1);
   printf("------------ Time's up ---------------\n");
 
-  st.wait_agents();
+  st.stop_agents();
 }

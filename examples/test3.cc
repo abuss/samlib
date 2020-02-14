@@ -6,39 +6,35 @@
 #include <samlib/agent_ref.hpp>
 
 
-template<typename GS, typename Tin, typename Tout=Tin>
+template<typename State, typename Tin, typename Tout=Tin>
 struct ping_pong_agent
-  : public samlib::agent<GS,Tin>
+  : public samlib::agent<State, Tin>
 {
-  typedef samlib::agent<GS,Tin>                    base_t;
-  typedef std::function<Tout(Tin)>                 task_t;
-  typedef samlib::agent_ref<ping_pong_agent>       agent_ref_type;
+  using base_t = samlib::agent<State, Tin>;
+  using task_t = std::function<Tout(Tin)>;
+  using agent_ref_type = samlib::agent_ref<ping_pong_agent>;
 
-  typedef samlib::agent_ref<ping_pong_agent<GS,Tin,Tout>> dest_agent_t;
+  using dest_agent_t = samlib::agent_ref<ping_pong_agent<State, Tin, Tout>>;
 
-  using base_t::global_state;
-  using typename base_t::agent;  // using namespace std::literals::chrono_literals;
-
-
-  task_t task;
+  task_t        task;
   dest_agent_t& out;
 
-  ping_pong_agent(GS& state, task_t&& fn, dest_agent_t& d)
+  constexpr ping_pong_agent(State& state, task_t&& fn, dest_agent_t& d)
   : base_t{state},
     task{fn},
     out(d)
   { }
 
-  agent_ref_type ref()
+  constexpr agent_ref_type ref() noexcept
   {
     return agent_ref_type(this);
   }
 
-  void run()
+  void run(std::stop_token st) override
   {
-    while (!global_state->terminate) {
-      Tin data = this->receive();
-      Tout new_data = task(data);
+    while (!st.stop_requested()) {
+      auto data = this->receive();
+      auto new_data = task(data);
       out.send(new_data);
     }
   }
@@ -61,11 +57,10 @@ double pong(double val)
 
 int main()
 {
-  struct state { bool terminate = false; };
-  state st;
+  samlib::empty_state st;
 
-  typedef ping_pong_agent<state,double> agent_t;
-  typedef agent_t::agent_ref_type agent_ref_t;
+  using agent_t = ping_pong_agent<samlib::empty_state, double>;
+  using agent_ref_t = agent_t::agent_ref_type;
 
   agent_ref_t p1,p2;
 
@@ -83,10 +78,10 @@ int main()
   p2.send(1);
 
   sleep(1);
-  printf("------------ Time's up ---------------\n");
-  st.terminate = true;
-  p1.wait();
-  p2.wait();
 
+  printf("------------ Time's up ---------------\n");
+
+  p1.stop();
+  p2.stop();
 
 }

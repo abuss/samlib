@@ -14,10 +14,10 @@ auto my_generator = [](auto fn, auto& out)
   using namespace std::literals::chrono_literals; 
   size_t sum = 0;
 
-  return [fn,&out,&sum](auto& gstate, auto& in_port) {
+  return [fn,&out,&sum](auto&, auto& in_port) {
     sum = 0;
     auto n = in_port.receive(); 
-    while ((n > 0) && (!gstate.terminate)) {
+    while ((n > 0)) {
       auto val = fn(n);
       sum += val;
       out.send(val);
@@ -62,7 +62,6 @@ int main()
 
   printf("------------ Time's up ---------------\n");
 
-  // st.stop_agents();
-  st.wait_agents();
-
+  st.stop_agents();
+  
 }

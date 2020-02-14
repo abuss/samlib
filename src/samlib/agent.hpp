@@ -11,40 +11,39 @@ struct empty_state {};
 template <typename A>
 class agent_ref;
 
-template <typename GState, typename Tin>
+template <typename State, typename Tin>
 class agent
   : public base<Tin>
 {
 protected:
   using base_t = base<Tin>;
-  using global_state_t = GState;
-  using task_t = std::function<void(global_state_t&, mailbox<Tin> &)>;
+  using task_t = std::function<void(State&, mailbox<Tin> &)>;
 
-  global_state_t *global_state;
+  State* state;
   task_t task;
 
 public:
   using agent_ref_type = agent_ref<agent>;
 
-  constexpr agent(global_state_t &gstate)
-      : global_state{&gstate}
+  constexpr agent(State& gstate)
+    : state{&gstate}
   { }
 
-  constexpr agent(global_state_t &gstate, task_t &&fn)
-      : global_state{&gstate},
-        task{fn}
+  constexpr agent(State& gstate, task_t&& fn)
+    : state{&gstate},
+      task{fn}
   { }
 
-  void run()
+  void run(std::stop_token st)
   {
-    while (!global_state->terminate)
+    while (!st.stop_requested())
     {
-      task(*global_state, this->mbox());
+      task(*state, this->mbox());
     }
     this->stop();
   }
 
-  agent_ref_type ref()
+  agent_ref_type ref() noexcept
   {
     return agent_ref_type(this);
   }

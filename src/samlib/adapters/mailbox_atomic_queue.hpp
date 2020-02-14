@@ -1,4 +1,5 @@
-// Mailbox implementation using queues
+// Mailbox adapter to use atomic_queue
+
 #pragma once
 
 #include <iostream>
