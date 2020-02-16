@@ -62,7 +62,9 @@ include(CTest)
 enable_testing()
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/samlib DESTINATION include)
-install(FILES ${PROJECT_SOURCE_DIR}/extern/jthread/source/*.hpp DESTINATION include)
+# Temporary added until C++20
+install(FILES ${PROJECT_SOURCE_DIR}/extern/jthread/source/jthread.hpp DESTINATION include)
+install(FILES ${PROJECT_SOURCE_DIR}/extern/jthread/source/stop_token.hpp DESTINATION include)
 
 message(STATUS "-------------------------------")
 message(STATUS "++ Setup: ")
