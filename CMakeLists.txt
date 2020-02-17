@@ -15,7 +15,7 @@ option(BUILD_TESTS "Build tests" ON)
 option(BUILD_DOCS "Build documentation" ON)
 option(BUILD_PYTHON_BINDING "Build python binding" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
-set(QUEUE_IMPLEMENTATION "concurrentqueue" CACHE STRING "Implementation of concurrent queue to use (concurrentqueue|atomic_queue)")
+set(QUEUE_IMPLEMENTATION "mycqueue" CACHE STRING "Implementation of concurrent queue to use (concurrentqueue|atomic_queue)")
 
 # set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
