@@ -21,8 +21,8 @@ auto fn_factory(int num)
 int main(int argc, char *argv[])
 {
  
-  typedef samlib::environment<samlib::base_state> env_t;
-  typedef env_t::agent_ref_type<size_t> agent_ref_t;
+  using env_t =  samlib::environment<>;
+  using agent_ref_t = env_t::agent_ref_type<size_t>;
 
   int n = 5;
   if (argc>1)
@@ -45,6 +45,6 @@ int main(int argc, char *argv[])
   sleep(1);
   printf("------------ Time's up ---------------\n");
 
-  st.wait_agents();
+  st.stop_agents();
 
 }

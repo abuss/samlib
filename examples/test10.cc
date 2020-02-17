@@ -49,9 +49,9 @@ void output(T val)
 
 int main()
 {
-  typedef samlib::environment<samlib::base_state> env_t;
+  using env_t =  samlib::environment<>;
 
-  env_t st(true);
+  env_t st;
   env_t::agent_ref_type<size_t> p_gen;
   env_t::agent_ref_type<vect_t> p_split, p_min, p_max;
   env_t::agent_ref_type<out_t> p_out;
@@ -64,7 +64,7 @@ int main()
   p_min = st.make_agent<vect_t>(samlib::transform(min_value,p_out));
   p_out = st.make_agent<out_t>(samlib::sink(output<out_t>));
 
-//  st.start_agents();
+ st.start_agents();
 
 //  sleep(1);
 
@@ -82,7 +82,7 @@ int main()
             ))
           ));
 
-//  st.start_agents();
+ st.start_agents();
 
   p_gen.send(2);
 
@@ -90,5 +90,5 @@ int main()
 
   printf("------------ Time's up ---------------\n");
 
-  st.wait_agents();
+  st.stop_agents();
 }

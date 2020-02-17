@@ -14,9 +14,6 @@ namespace samlib
         if (auto data = in_port.try_receive()) {
           out.send(fn(std::move(*data)));
         }
-        // else {
-          // std::this_thread::yield();
-        // }
     };
   }
 
@@ -27,16 +24,11 @@ namespace samlib
     return [fn,&out](auto& state, auto& in_port) {
         if (auto dat = in_port.try_receive()) {
           auto n = *dat;
-          while ((n > 0) && (!state.terminate)) {
+          while ((n > 0)) {
             out.send(fn(n));
-            // global.ngen += 1;
-            // ++ngen;
             --n;
           }
         }
-        // else {
-          // std::this_thread::sleep_for(20ms);
-        // }
     };
   }
 
@@ -46,8 +38,6 @@ namespace samlib
       return [fn](auto&, auto& in_port) {
           if (auto data = in_port.try_receive())
             fn(*data);
-          // else
-            // std::this_thread::yield();
       };
   };
 
@@ -60,9 +50,6 @@ namespace samlib
           for (auto out : {outs...})
             out.send(*data);
         }
-        // else {
-          // std::this_thread::yield();
-        // }
     };
   }
 

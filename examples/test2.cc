@@ -62,7 +62,7 @@ struct pong
 
 int main()
 {
-  struct state { bool terminate = false; };  
+  struct state { };  
   state st;
   
   ping_pong_agent<state,double,ping> p1(st, ping());
@@ -80,9 +80,8 @@ int main()
 
   sleep(1);
   printf("------------ Time's up ---------------\n");
-  st.terminate = true;
-  p1.wait();
-  p2.wait();
+  p1.stop();
+  p2.stop();
 
 
 }

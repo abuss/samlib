@@ -30,7 +30,7 @@ TEST_CASE("testing mailbox's agent") {
   {
     using agent_ref_type = samlib::agent_ref<my_agent>;
 
-    my_agent(samlib::base_state&) {};
+    my_agent(samlib::empty_state&) {};
 
     void run(std::stop_token)
     {
@@ -48,7 +48,7 @@ TEST_CASE("testing mailbox's agent") {
     }
   };
 
-  typedef samlib::environment<samlib::base_state> env_t;
+  using env_t = samlib::environment<>;
 
   env_t st;
 

@@ -21,7 +21,7 @@ auto fn_factory(std::string name)
 int main()
 {
  
-  typedef samlib::environment<samlib::base_state> env_t;
+  using env_t =  samlib::environment<>;
   
   env_t st;
 
@@ -40,5 +40,5 @@ int main()
   sleep(1);
   printf("------------ Time's up ---------------\n");
 
-  st.wait_agents();
+  st.stop_agents();
 }

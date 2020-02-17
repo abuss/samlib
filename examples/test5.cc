@@ -22,7 +22,7 @@ size_t gen(size_t val)
 
 int main()
 {
-  typedef samlib::environment<samlib::base_state> env_t;
+  using env_t =  samlib::environment<>;
 
   env_t st;
   env_t::agent_ref_type<size_t> p1,p2;
@@ -37,6 +37,6 @@ int main()
   sleep(1);
   
   printf("------------ Time's up ---------------\n");
-  st.wait_agents();
+  st.stop_agents();
 
 }

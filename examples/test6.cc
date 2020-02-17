@@ -42,7 +42,7 @@ size_t gen(size_t val)
 int main()
 {
  
-  typedef samlib::environment<samlib::base_state> env_t;
+  using env_t =  samlib::environment<>;
 
   struct local_state { size_t sum=0; } lst;
 
@@ -56,7 +56,7 @@ int main()
 
   st.start_agents();
 
-  p1.send(1000000);
+  p1.send(10000);
 
   sleep(1);
 

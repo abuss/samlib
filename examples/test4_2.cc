@@ -23,8 +23,8 @@ size_t pong(size_t val)
 
 int main()
 {
-  typedef samlib::environment<samlib::base_state> env_t;
-
+  using env_t = samlib::environment<>; 
+  
   env_t st;
   size_t nmsg =0;
 
@@ -42,8 +42,6 @@ int main()
   sleep(1);
   printf("------------ Time's up ---------------\n");
   std::cout << "last:" << nmsg << std::endl;
-  // p1.stop();
-  // p2.stop();
-
+  
   st.stop_agents();
 }

@@ -11,15 +11,10 @@
 namespace samlib
 {
 
-  struct base_state {
-    bool terminate = false;
-  };
-
-
 /*!
     Global enviroment definition where the agents share information
 */
-  template<typename Env>
+  template<typename Env=empty_state>
   class environment
     : public Env
   {
@@ -80,7 +75,6 @@ namespace samlib
 
     void start_agents()
     {
-      this->terminate = false;
       for(auto& a : agents)
         a.executor->start(a.num_workers);
     }
@@ -94,7 +88,6 @@ namespace samlib
 
     void stop_agents()
     {
-      this->terminate = true;
       for(auto& a : agents)
         a.executor->stop();
     }
