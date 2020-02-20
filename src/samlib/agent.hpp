@@ -1,23 +1,20 @@
 #pragma once
 
-#include <samlib/base.hpp>
-#include <samlib/mailbox.hpp>
+#include <samlib/base_agent.hpp>
 
 namespace samlib
 {
 
-struct empty_state {};
-
-template <typename A>
-class agent_ref;
+// struct empty_state {};
 
 template <typename State, typename Tin>
 class agent
-  : public base<Tin>
+  : public base_agent<Tin>
 {
 protected:
-  using base_t = base<Tin>;
-  using task_t = std::function<void(State&, mailbox<Tin> &)>;
+
+  using base_t = base_agent<Tin>;
+  using task_t = std::function<void(State&, typename base_t::mailbox_type&)>;
 
   State* state;
   task_t task;
@@ -29,7 +26,7 @@ public:
     : state{&gstate}
   { }
 
-  constexpr agent(State& gstate, task_t&& fn)
+  constexpr agent(State& gstate, task_t fn)
     : state{&gstate},
       task{fn}
   { }
@@ -40,10 +37,9 @@ public:
     {
       task(*state, this->mbox());
     }
-    this->stop();
   }
 
-  agent_ref_type ref() noexcept
+  constexpr agent_ref_type ref() noexcept
   {
     return agent_ref_type(this);
   }

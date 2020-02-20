@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <iostream>
 
+#include <samlib/agent.hpp>
 #include <samlib/tasks.hpp>
 #include <samlib/environment.hpp>
 
@@ -21,16 +22,17 @@ size_t pong(size_t val)
 
 int main()
 {
-  using env_t = samlib::environment<>;
+  using env_t =  samlib::environment<>;
 
   env_t env;
 
-  env_t::agent_ref_type<size_t> p1,p2;
+  using agent_t = samlib::agent<env_t::state_type,size_t>;
+  samlib::agent_ref<agent_t> p1, p2;
 
-  p1 = env.make_agent<size_t>(samlib::transform(ping,p2),2);
-  p2 = env.make_agent<size_t>(samlib::transform(pong,p1),1);
+  p1 = env.create_agent<agent_t>(transform(ping,p2));
+  p2 = env.create_agent<agent_t>(transform(pong,p1));
 
-  // st.start_agents();
+  // env.start_agents();
 
   sleep(1);
 

@@ -1,9 +1,7 @@
 
 #include <unistd.h>
 #include <iostream>
-#include <tuple>
 
-#include <samlib/agent.hpp>
 #include <samlib/tasks.hpp>
 #include <samlib/environment.hpp>
 
@@ -24,19 +22,19 @@ int main()
 {
   using env_t =  samlib::environment<>;
 
-  env_t st;
-  env_t::agent_ref_type<size_t> p1,p2;
+  env_t env;
+  env_t::stateless_agent_ref_type<size_t> p1,p2;
 
-  p1 = st.make_agent<size_t>(samlib::generator(gen,p2));
-  p2 = st.make_agent<size_t>(samlib::sink(hole));
+  p1 = env.make_stateless_agent<size_t>(samlib::stateless::generator(gen,p2));
+  p2 = env.make_stateless_agent<size_t>(samlib::stateless::sink(hole));
 
-  st.start_agents();
+  // st.start_agents();
 
-  p1.send(10000);
+  p1.send(100000);
 
   sleep(1);
   
   printf("------------ Time's up ---------------\n");
-  st.stop_agents();
+  env.stop_agents();
 
 }

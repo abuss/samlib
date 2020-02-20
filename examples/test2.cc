@@ -2,41 +2,45 @@
 #include <unistd.h>
 #include <iostream>
 
-#include <samlib/base.hpp>
+#include <samlib/base_agent.hpp>
+#include <samlib/agent_ref.hpp>
 
-template<typename GS, typename T, typename Task>
+template<typename State, typename T, typename Task>
 struct ping_pong_agent
-  : public samlib::base<T>
+  : public samlib::base_agent<T>
 {
-  GS*                global_state;
-  samlib::base<T>*   mbox_output;
+  State*                  state;
+  using pp_ref_t = samlib::agent_ref<samlib::base_agent<T>>;
+
+  pp_ref_t output;
 
   Task producer;
 
   ping_pong_agent()
-    : global_state{nullptr}, mbox_output{nullptr}
+    : state{nullptr}
   { }
 
-  ping_pong_agent(GS& gstate, Task fn)
-    : global_state(&gstate),
+  ping_pong_agent(State& gstate, Task fn)
+    : state(&gstate),
       producer(fn)
   { }
 
   ~ping_pong_agent() { }
 
-  void set_output(samlib::base<T>& mb_out)
+  void set_output(pp_ref_t out)
   {
-    mbox_output = &mb_out;
+    output = out;
   }
 
-  void run(std::stop_token st)
+  void run(std::stop_token stoken)
   {
-    while (!st.stop_requested()) {
+    while (!stoken.stop_requested()) {
       auto data = this->receive();
       auto new_data = producer(data);
-      mbox_output->send(*new_data);
+      output.send(*new_data);
     }
   }
+
 };
 
 
@@ -68,8 +72,8 @@ int main()
   ping_pong_agent<state,double,ping> p1(st, ping());
   ping_pong_agent<state,double,pong> p2(st, pong());
 
-  p1.set_output(p2);
-  p2.set_output(p1);
+  p1.set_output(p2.ref());
+  p2.set_output(p1.ref());
 
   p1.start();
   p2.start();
@@ -79,9 +83,10 @@ int main()
   p2.send(1);
 
   sleep(1);
+
   printf("------------ Time's up ---------------\n");
+
   p1.stop();
   p2.stop();
-
 
 }

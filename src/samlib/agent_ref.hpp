@@ -1,7 +1,5 @@
 #pragma once
 
-#include "agent.hpp"
-
 namespace samlib
 {
 
@@ -25,12 +23,8 @@ namespace samlib
       : ptr(other.ptr)
     { }
 
-    agent_ref& operator=(const agent_ref& other)
-    {
-      ptr = other.ptr;
-      return *this;
-    }
-
+    agent_ref& operator=(const agent_ref& other) = default;
+    
     template<typename T>
     constexpr bool send(const T& value) const
     {
@@ -58,10 +52,10 @@ namespace samlib
       ptr->stop();
     }
 
-    agent_t& ref_agent() const
-    {
-      return *ptr;
-    }
+    // agent_t& ref_agent() const
+    // {
+    //   return *ptr;
+    // }
   };
 
 }

@@ -1,10 +1,8 @@
 
 #include <unistd.h>
 #include <iostream>
-#include <tuple>
 #include <vector>
 
-#include <samlib/agent.hpp>
 #include <samlib/tasks.hpp>
 #include <samlib/environment.hpp>
 
@@ -41,16 +39,16 @@ payload pong(payload val)
 int main()
 {
  
-  using env_t =  samlib::environment<>;
+  using env_t = samlib::environment<>;
   
-  env_t st;
+  env_t env;
 
   env_t::agent_ref_type<payload> p1,p2;
 
-  p1 = st.make_agent<payload>(samlib::transform(ping,p2));
-  p2 = st.make_agent<payload>(samlib::transform(pong,p1));
+  p1 = env.make_agent<payload>(samlib::transform(ping,p2));
+  p2 = env.make_agent<payload>(samlib::transform(pong,p1));
 
-  st.start_agents();
+  // st.start_agents();
 
   payload vec(1000); //{1000};
 
@@ -61,5 +59,5 @@ int main()
   sleep(1);
   printf("------------ Time's up ---------------\n");
 
-  st.stop_agents();
+  env.stop_agents();
 }

@@ -1,14 +1,15 @@
-// Mailbox adapter using mucqueue
+// Mailbox adapter using mycqueue
 
 #pragma once
 
 #include <iostream>
 #include <optional>
 #include <chrono>
+#include <jthread.hpp>
 
 #include "mycqueue.hpp"
 
-  
+
 namespace samlib
 {
  
@@ -18,12 +19,18 @@ namespace samlib
   {
 
     using base_t = mycqueue<T>;
+    std::stop_token stop_flag;
 
   public:
 
     mailbox(size_t capacity_=64)
       : base_t(capacity_)
     { }
+
+    void set_stop_token(std::stop_token st)
+    {
+      stop_flag = st; 
+    }
 
     size_t size_approx() const
     {
@@ -34,29 +41,36 @@ namespace samlib
 
     bool send(const value_type& value)
     {
-      this->push(value);
-      return true;
+      if (!stop_flag.stop_requested()) {
+        this->push(value);
+        return true;
+      }
+      return false;
     }
 
     bool send(value_type&& value)
     {
-      this->push(std::forward<value_type>(value));
-      return true;
+      if (!stop_flag.stop_requested()) {
+        this->push(std::forward<value_type>(value));
+        return true;
+      }
+      return false;
     }
 
     value_type receive()
     {
-      return this->pop();
+      if (!stop_flag.stop_requested()) {
+        return this->pop();
+      }
+      return value_type();
     }
     
     std::optional<value_type> try_receive()
     {
       value_type value;
-      if (this->try_pop(value) && !is_closed())
+      if (this->try_pop(value) && !is_closed() && !stop_flag.stop_requested())
         return std::make_optional(std::move(value));
       return std::nullopt;
-      // value = this->pop();
-      // return std::make_optional(std::move(value));
     }
 
     using base_t::close;

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <tuple>
 
-#include <samlib/agent.hpp>
+#include <samlib/stateless_agent.hpp>
 #include <samlib/tasks.hpp>
 #include <samlib/environment.hpp>
 
@@ -25,14 +25,13 @@ int main()
 {
   using env_t =  samlib::environment<>;
 
-  env_t st;
+  env_t env;
 
-  env_t::agent_ref_type<size_t> p1,p2;
+  using agent_t = samlib::stateless_agent<size_t>;
+  samlib::agent_ref<agent_t> p1, p2;
 
-  p1 = st.make_agent<size_t>(samlib::transform(ping,p2));
-  p2 = st.make_agent<size_t>(samlib::transform(pong,p1));
-
-  st.start_agents();
+  p1 = env.create_stateless_agent<agent_t>(samlib::stateless::transform(ping,p2));
+  p2 = env.create_stateless_agent<agent_t>(samlib::stateless::transform(pong,p1));
 
   sleep(1);
 
@@ -41,5 +40,5 @@ int main()
   sleep(1);
   printf("------------ Time's up ---------------\n");
 
-  st.stop_agents();
+  env.stop_agents();
 }

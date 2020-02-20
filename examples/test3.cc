@@ -2,30 +2,29 @@
 #include <unistd.h>
 #include <iostream>
 
-#include <samlib/agent.hpp>
+#include <samlib/base_agent.hpp>
 #include <samlib/agent_ref.hpp>
 
 
-template<typename State, typename Tin, typename Tout=Tin>
+template<typename Tin, typename Tout=Tin>
 struct ping_pong_agent
-  : public samlib::agent<State, Tin>
+  : public samlib::base_agent<Tin>
 {
-  using base_t = samlib::agent<State, Tin>;
-  using task_t = std::function<Tout(Tin)>;
+  using base_t = samlib::base_agent<Tin>;
+  using ntask_t = std::function<Tout(Tin)>;
   using agent_ref_type = samlib::agent_ref<ping_pong_agent>;
 
-  using dest_agent_t = samlib::agent_ref<ping_pong_agent<State, Tin, Tout>>;
+  using dest_agent_t = samlib::agent_ref<ping_pong_agent<Tin, Tout>>;
 
-  task_t        task;
+  ntask_t       ntask;
   dest_agent_t& out;
 
-  constexpr ping_pong_agent(State& state, task_t&& fn, dest_agent_t& d)
-  : base_t{state},
-    task{fn},
+  constexpr ping_pong_agent(ntask_t&& fn, dest_agent_t& d)
+  : ntask{fn},
     out(d)
   { }
 
-  constexpr agent_ref_type ref() noexcept
+  agent_ref_type ref() noexcept
   {
     return agent_ref_type(this);
   }
@@ -34,7 +33,7 @@ struct ping_pong_agent
   {
     while (!st.stop_requested()) {
       auto data = this->receive();
-      auto new_data = task(data);
+      auto new_data = ntask(data);
       out.send(new_data);
     }
   }
@@ -57,15 +56,13 @@ double pong(double val)
 
 int main()
 {
-  samlib::empty_state st;
-
-  using agent_t = ping_pong_agent<samlib::empty_state, double>;
+  using agent_t = ping_pong_agent<double>;
   using agent_ref_t = agent_t::agent_ref_type;
 
   agent_ref_t p1,p2;
 
-  auto pp1 = agent_t(st, ping, p2);
-  auto pp2 = agent_t(st, pong, p1);
+  auto pp1 = agent_t(ping, p2);
+  auto pp2 = agent_t(pong, p1);
 
   p1 = pp1.ref();
   p2 = pp2.ref();

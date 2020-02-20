@@ -1,10 +1,8 @@
 
 #include <unistd.h>
 #include <iostream>
-#include <tuple>
 #include <vector> 
 
-#include <samlib/agent.hpp>
 #include <samlib/tasks.hpp>
 #include <samlib/environment.hpp>
 
@@ -28,15 +26,15 @@ int main(int argc, char *argv[])
   if (argc>1)
     n = atoi(argv[1]);
   
-  env_t st;
+  env_t env;
 
   std::vector<agent_ref_t> agents(n);
 
   for (int i=0;i<n;++i) {
-    agents[i] = st.make_agent<size_t>(samlib::transform(fn_factory(i), agents[(i+1)%n]) );
+    agents[i] = env.make_agent<size_t>(samlib::transform(fn_factory(i), agents[(i+1)%n]) );
   }
 
-  st.start_agents();
+  //st.start_agents();
 
   sleep(1);
 
@@ -45,6 +43,6 @@ int main(int argc, char *argv[])
   sleep(1);
   printf("------------ Time's up ---------------\n");
 
-  st.stop_agents();
+  env.stop_agents();
 
 }
