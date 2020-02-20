@@ -33,7 +33,7 @@ struct ping_pong_agent
   {
     while (!st.stop_requested()) {
       auto data = this->receive();
-      auto new_data = ntask(data);
+      auto new_data = ntask(*data);
       out.send(new_data);
     }
   }

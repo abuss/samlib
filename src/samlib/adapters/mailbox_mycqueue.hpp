@@ -57,12 +57,12 @@ namespace samlib
       return false;
     }
 
-    value_type receive()
+    std::optional<value_type> receive()
     {
       if (!stop_flag.stop_requested()) {
         return this->pop();
       }
-      return value_type();
+      return std::nullopt;
     }
     
     std::optional<value_type> try_receive()

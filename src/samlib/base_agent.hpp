@@ -15,7 +15,7 @@ namespace samlib
   {
   protected:
 
-    T receive()
+    inline std::optional<T> receive()
     {
       return _mbox.receive();
     }
@@ -91,7 +91,6 @@ namespace samlib
 
     executor_type  _executor;
     mailbox_type   _mbox;
-
 
   };
 

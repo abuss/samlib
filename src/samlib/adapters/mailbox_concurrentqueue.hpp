@@ -48,13 +48,16 @@ namespace samlib
       return false;
     }
 
-    value_type receive()
+    std::optional<value_type> receive()
     {
       value_type value;
-      while (!this->try_dequeue(value) && !stop_flag.stop_requested()) {
+      while (!this->try_dequeue(value)) {
         std::this_thread::sleep_for(5ms);
+        if (stop_flag.stop_requested())
+          return std::nullopt;
       }
-      return value;
+      // return value;
+      return std::make_optional(std::move(value));
     }
     
     std::optional<value_type> try_receive()

@@ -36,7 +36,7 @@ struct ping_pong_agent
   {
     while (!stoken.stop_requested()) {
       auto data = this->receive();
-      auto new_data = producer(data);
+      auto new_data = producer(*data);
       output.send(*new_data);
     }
   }

@@ -21,7 +21,7 @@ namespace samlib
   template<typename Fn, typename O>
   auto generator(Fn fn, const O& out)
   {
-    return [fn,&out](auto& state, auto& in_port) {
+    return [fn,&out](auto&, auto& in_port) {
         if (auto dat = in_port.try_receive()) {
           auto n = *dat;
           while ((n > 0)) {

@@ -18,7 +18,6 @@ size_t pong(size_t val)
   return val;
 }
 
-
 int main()
 {
   using env_t = samlib::environment<>;
