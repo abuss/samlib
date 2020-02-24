@@ -52,10 +52,10 @@ namespace samlib
       ptr->stop();
     }
 
-    // agent_t& ref_agent() const
-    // {
-    //   return *ptr;
-    // }
+    agent_t& ref_agent() const
+    {
+      return *ptr;
+    }
   };
 
 }
