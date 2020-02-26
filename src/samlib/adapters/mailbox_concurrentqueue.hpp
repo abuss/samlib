@@ -18,7 +18,7 @@ namespace samlib
     : moodycamel::ConcurrentQueue<T>
   {
 
-    std::stop_token stop_flag;
+    bool stop_flag = false;
 
   public:
 
@@ -29,21 +29,21 @@ namespace samlib
     using moodycamel::ConcurrentQueue<T>::try_dequeue;
     using moodycamel::ConcurrentQueue<T>::size_approx;
 
-    void set_stop_token(std::stop_token st)
+    void stop(bool flag)
     {
-      stop_flag = st; 
+      stop_flag = flag; 
     }
 
     bool send(const value_type& value)
     {
-      if (!stop_flag.stop_requested())
+      if (!stop_flag)
         return this->enqueue(value);
       return false;
     }
 
     bool send(value_type&& value)
     {
-      if (!stop_flag.stop_requested())
+      if (!stop_flag)
         return this->enqueue(std::forward<value_type>(value));
       return false;
     }
@@ -53,7 +53,7 @@ namespace samlib
       value_type value;
       while (!this->try_dequeue(value)) {
         std::this_thread::sleep_for(5ms);
-        if (stop_flag.stop_requested())
+        if (stop_flag)
           return std::nullopt;
       }
       // return value;
@@ -63,12 +63,14 @@ namespace samlib
     std::optional<value_type> try_receive()
     {
       value_type value;
-      if (this->try_dequeue_non_interleaved(value) && !stop_flag.stop_requested())
+      if (!stop_flag && this->try_dequeue_non_interleaved(value))
         return std::make_optional(std::move(value));
       return std::nullopt;
     }
 
-    void close() { }
+    void close() { 
+      stop_flag = true;
+    }
 
 
   };

@@ -19,7 +19,7 @@ namespace samlib
   {
 
     using base_t = mycqueue<T>;
-    std::stop_token stop_flag;
+    bool stop_flag = false;
 
   public:
 
@@ -27,9 +27,9 @@ namespace samlib
       : base_t(capacity_)
     { }
 
-    void set_stop_token(std::stop_token st)
+    void stop(bool flag)
     {
-      stop_flag = st; 
+      stop_flag = flag; 
     }
 
     size_t size_approx() const
@@ -41,7 +41,7 @@ namespace samlib
 
     bool send(const value_type& value)
     {
-      if (!stop_flag.stop_requested()) {
+      if (!stop_flag) {
         this->push(value);
         return true;
       }
@@ -50,7 +50,7 @@ namespace samlib
 
     bool send(value_type&& value)
     {
-      if (!stop_flag.stop_requested()) {
+      if (!stop_flag) {
         this->push(std::forward<value_type>(value));
         return true;
       }
@@ -59,7 +59,7 @@ namespace samlib
 
     std::optional<value_type> receive()
     {
-      if (!stop_flag.stop_requested()) {
+      if (!stop_flag) {
         return this->pop();
       }
       return std::nullopt;
@@ -68,13 +68,15 @@ namespace samlib
     std::optional<value_type> try_receive()
     {
       value_type value;
-      if (this->try_pop(value) && !is_closed() && !stop_flag.stop_requested())
+      if (!stop_flag && this->try_pop(value))
         return std::make_optional(std::move(value));
       return std::nullopt;
     }
 
-    using base_t::close;
-    using base_t::is_closed;
+    void close() {
+      stop_flag = true;
+      base_t::close();
+    }
 
   };
 
