@@ -1,7 +1,5 @@
-
 #include <unistd.h>
 #include <iostream>
-#include <tuple>
 
 #include <samlib/stateless_agent.hpp>
 #include <samlib/tasks.hpp>

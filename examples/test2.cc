@@ -10,9 +10,10 @@ struct ping_pong_agent
   : public samlib::base_agent<T>
 {
   State*                  state;
-  using pp_ref_t = samlib::agent_ref<samlib::base_agent<T>>;
 
-  pp_ref_t output;
+  using agent_ref_t = samlib::base_agent<T>;
+
+  agent_ref_t* output;
 
   Task producer;
 
@@ -27,9 +28,9 @@ struct ping_pong_agent
 
   ~ping_pong_agent() { }
 
-  void set_output(pp_ref_t out)
+  void set_output(agent_ref_t& out)
   {
-    output = out;
+    output = &out;
   }
 
   void run(std::stop_token stoken)
@@ -37,7 +38,7 @@ struct ping_pong_agent
     while (!stoken.stop_requested()) {
       auto data = this->receive();
       auto new_data = producer(*data);
-      output.send(*new_data);
+      output->send(*new_data);
     }
   }
 
@@ -69,11 +70,17 @@ int main()
   struct state { };  
   state st;
   
-  ping_pong_agent<state,double,ping> p1(st, ping());
-  ping_pong_agent<state,double,pong> p2(st, pong());
+  using ping_t = ping_pong_agent<state,double,ping>;
+  using pong_t = ping_pong_agent<state,double,pong>;
 
-  p1.set_output(p2.ref());
-  p2.set_output(p1.ref());
+  using ref_ping_t = samlib::agent_ref<ping_t>;
+  using ref_pong_t = samlib::agent_ref<pong_t>;
+
+  ref_ping_t p1(new ping_t(st, ping()));
+  ref_pong_t p2(new pong_t(st, pong()));
+
+  p1.ref_agent().set_output(p2.ref_agent());
+  p2.ref_agent().set_output(p1.ref_agent());
 
   p1.start();
   p2.start();
@@ -88,5 +95,6 @@ int main()
 
   p1.stop();
   p2.stop();
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 }

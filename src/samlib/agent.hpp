@@ -5,8 +5,6 @@
 namespace samlib
 {
 
-// struct empty_state {};
-
 template <typename State, typename Tin>
 class agent
   : public base_agent<Tin>

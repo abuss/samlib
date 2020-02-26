@@ -61,11 +61,8 @@ int main()
 
   agent_ref_t p1,p2;
 
-  auto pp1 = agent_t(ping, p2);
-  auto pp2 = agent_t(pong, p1);
-
-  p1 = pp1.ref();
-  p2 = pp2.ref();
+  p1 = agent_ref_t(new agent_t(ping, p2));
+  p2 = agent_ref_t(new agent_t(pong, p1));
 
   p1.start();
   p2.start();

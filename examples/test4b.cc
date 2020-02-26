@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 #include <iostream>
 
@@ -31,8 +30,6 @@ int main()
 
   p1 = env.create_agent<agent_t>(transform(ping,p2));
   p2 = env.create_agent<agent_t>(transform(pong,p1));
-
-  // env.start_agents();
 
   sleep(1);
 

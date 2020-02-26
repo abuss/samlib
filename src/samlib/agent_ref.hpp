@@ -7,7 +7,7 @@ namespace samlib
   class agent_ref
   {
     using agent_t = A;
-    agent_t* ptr;
+    std::shared_ptr<agent_t> ptr;
 
   public:
 
@@ -19,12 +19,24 @@ namespace samlib
       : ptr(a)
     { }
 
-    agent_ref(const agent_ref& other)
-      : ptr(other.ptr)
-    { }
+    agent_ref(const agent_ref&) = default;
+    //   : ptr(other.ptr)
+    // { 
+    //   // printf("[COPY] agent_ref.ptr <- %lu\n",(size_t)ptr.get());
+    // }
 
-    agent_ref& operator=(const agent_ref& other) = default;
+    agent_ref& operator=(const agent_ref& other)
+    { 
+      ptr.reset(other.ptr);
+      return *this;
+    }
     
+    agent_ref& operator=(agent_ref&& other)
+    { 
+      ptr = std::move(other.ptr);
+      return *this;
+    }
+
     template<typename T>
     constexpr bool send(const T& value) const
     {

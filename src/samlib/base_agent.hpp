@@ -26,27 +26,18 @@ namespace samlib
     }
 
   public:
-    using agent_ref_type = agent_ref<base_agent>;
-    // using executor_type = std::jthread;
+
     using executor_type = executor;
     using mailbox_type = mailbox<T>;
 
-    // base_agent() = default;
-    base_agent() {};
-
     ~base_agent() {
-      stop();
+      _mbox.close();
     }
 
     void start(uint num_workers = 1)
     {
-      // _executor = std::jthread([&](std::stop_token st) {
-          // _mbox.set_stop_token(st); 
-          // run(st); 
-        // });
       _executor = executor([&](std::stop_token st) {
-          _mbox.set_stop_token(st); 
-          run(st); 
+          this->run(st); 
         }, num_workers);
     }
 
@@ -61,19 +52,9 @@ namespace samlib
       return _mbox.send(value);
     }
 
-    // bool send(T value)
-    // {
-    //   return _mbox.send(value);
-    // }
-
     bool send(T&& value)
     {
       return _mbox.send(std::forward<T>(value));
-    }
-
-    agent_ref_type ref() noexcept
-    {
-      return agent_ref_type(this);
     }
 
     executor_type* get_executor() {

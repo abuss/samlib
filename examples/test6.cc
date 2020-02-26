@@ -13,12 +13,14 @@ auto my_generator = [](auto fn, auto& out)
 
   return [fn,&out,&sum](auto& in_port) {
     sum = 0;
-    auto n = *(in_port.receive()); 
-    while ((n > 0)) {
-      auto val = fn(n);
-      sum += val;
-      out.send(val);
-      --n;
+    if (auto data = in_port.receive()) {
+      auto n = *data;
+      while ((n > 0)) {
+        auto val = fn(n);
+        sum += val;
+        out.send(val);
+        --n;
+      }
     }
     printf("Sum: %lu\n",sum);
   };

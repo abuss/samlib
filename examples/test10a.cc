@@ -51,21 +51,26 @@ int main()
   using env_t =  samlib::environment<>;
 
   env_t env;
-  env_t::agent_ref_type<size_t> p_gen;
-  env_t::agent_ref_type<vect_t> p_split, p_min, p_max;
-  env_t::agent_ref_type<out_t> p_out;
+  env_t::stateless_agent_ref_type<size_t> p_gen;
+  env_t::stateless_agent_ref_type<vect_t> p_split, p_min, p_max;
+  env_t::stateless_agent_ref_type<out_t> p_out;
 
   printf("------------ First version ---------------\n");
 
-  p_gen = env.make_agent<size_t>(samlib::generator(generate,p_split));
-  p_split = env.make_agent<vect_t>(samlib::splitter(p_min,p_max));
-  p_max = env.make_agent<vect_t>(samlib::transform(max_value,p_out));
-  p_min = env.make_agent<vect_t>(samlib::transform(min_value,p_out));
-  p_out = env.make_agent<out_t>(samlib::sink(output<out_t>));
-
+  p_gen = env.make_stateless_agent<size_t>(
+        samlib::stateless::generator(generate,p_split));
+  p_split = env.make_stateless_agent<vect_t>(
+        samlib::stateless::splitter(p_min,p_max));
+  p_max = env.make_stateless_agent<vect_t>(
+        samlib::stateless::transform(max_value,p_out));
+  p_min = env.make_stateless_agent<vect_t>(
+        samlib::stateless::transform(min_value,p_out));
+  p_out = env.make_stateless_agent<out_t>(
+        samlib::stateless::sink(output<out_t>));
+ 
  //st.start_agents();
 
-//  sleep(1);
+ sleep(1);
 
   p_gen.send(2);
 
@@ -73,17 +78,21 @@ int main()
 
   printf("------------ Second version ---------------\n");
 
-  p_gen = env.make_agent<size_t>(samlib::generator(
-            generate,
-            env.make_agent<vect_t>(samlib::splitter(
-                  env.make_agent<vect_t>(samlib::transform(min_value,p_out)),
-                  env.make_agent<vect_t>(samlib::transform(max_value,p_out))
-            ))
-          ));
+  auto p_gen2 = env.make_stateless_agent<size_t>(
+    samlib::stateless::generator(generate, 
+          env.make_stateless_agent<vect_t>(samlib::stateless::splitter(
+              env.make_stateless_agent<vect_t>(
+                  samlib::stateless::transform(min_value,p_out)),
+              env.make_stateless_agent<vect_t>(
+                  samlib::stateless::transform(max_value,p_out))
+          ))
+    ));
 
  //st.start_agents();
 
-  p_gen.send(2);
+  sleep(1);
+
+  p_gen2.send(2);
 
   sleep(1);
 

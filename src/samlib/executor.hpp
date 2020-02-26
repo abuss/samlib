@@ -19,7 +19,7 @@ public:
   explicit executor(F&& f, uint num_workers, Args&&... args)
   {
     for(uint i=0; i < num_workers; ++i) {
-      workers.push_back(std::jthread(std::forward<F>(f), std::forward<Args>(args)...));
+      workers.emplace_back(std::forward<F>(f), std::forward<Args>(args)...);
     }
   }
 
@@ -43,7 +43,6 @@ public:
   }
 
 };
-
 
 
 } // namespace samlib

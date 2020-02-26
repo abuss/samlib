@@ -8,7 +8,7 @@ namespace samlib
   using namespace std::literals::chrono_literals;
 
   template<typename Fn, typename O>
-  auto transform(Fn fn, const O& out)
+  auto transform(Fn fn, O& out)
   {
     return [fn,&out](auto&, auto& in_port) {
         if (auto data = in_port.try_receive()) {
@@ -17,11 +17,35 @@ namespace samlib
     };
   }
 
+  template<typename Fn, typename O>
+  auto transform(Fn fn, O&& out)
+  {
+    return [fn,out](auto&, auto& in_port) {
+        if (auto data = in_port.try_receive()) {
+          out.send(fn(std::move(*data)));
+        }
+    };
+  }
+
 
   template<typename Fn, typename O>
-  auto generator(Fn fn, const O& out)
+  auto generator(Fn fn, O& out)
   {
     return [fn,&out](auto&, auto& in_port) {
+        if (auto dat = in_port.try_receive()) {
+          auto n = *dat;
+          while ((n > 0)) {
+            out.send(fn(n));
+            --n;
+          }
+        }
+    };
+  }
+
+  template<typename Fn, typename O>
+  auto generator(Fn fn, O&& out)
+  {
+    return [fn,out](auto&, auto& in_port) {
         if (auto dat = in_port.try_receive()) {
           auto n = *dat;
           while ((n > 0)) {
@@ -43,7 +67,7 @@ namespace samlib
 
 
   template<typename... O>
-  auto splitter(const O&... outs)
+  auto splitter(O&... outs)
   {
     return [&](auto, auto& in_port) {
         if (auto data = in_port.try_receive()) {
@@ -53,11 +77,24 @@ namespace samlib
     };
   }
 
+  template<typename... O>
+  auto splitter(O&&... outs)
+  {
+    return [=](auto, auto& in_port) {
+        if (auto data = in_port.try_receive()) {
+          for (auto out : {outs...})
+            out.send(*data);
+        }
+    };
+  }
+
+
+
 namespace stateless
 {
 
   template<typename Fn, typename O>
-  auto transform(Fn fn, const O& out)
+  auto transform(Fn fn, O& out)
   {
     return [fn,&out](auto& in_port) {
         if (auto data = in_port.try_receive()) {
@@ -66,11 +103,35 @@ namespace stateless
     };
   }
 
+  template<typename Fn, typename O>
+  auto transform(Fn fn, O&& out)
+  {
+    return [fn,out](auto& in_port) {
+        if (auto data = in_port.try_receive()) {
+          out.send(fn(std::move(*data)));
+        }
+    };
+  }
+
 
   template<typename Fn, typename O>
-  auto generator(Fn fn, const O& out)
+  auto generator(Fn fn, O& out)
   {
     return [fn,&out](auto& in_port) {
+        if (auto dat = in_port.try_receive()) {
+          auto n = *dat;
+          while ((n > 0)) {
+            out.send(fn(n));
+            --n;
+          }
+        }
+    };
+  }
+
+  template<typename Fn, typename O>
+  auto generator(Fn fn, O&& out)
+  {
+    return [fn,out](auto& in_port) {
         if (auto dat = in_port.try_receive()) {
           auto n = *dat;
           while ((n > 0)) {
@@ -92,7 +153,7 @@ namespace stateless
 
 
   template<typename... O>
-  auto splitter(const O&... outs)
+  auto splitter(O&... outs)
   {
     return [&](auto& in_port) {
         if (auto data = in_port.try_receive()) {
@@ -101,6 +162,18 @@ namespace stateless
         }
     };
   }
+
+  template<typename... O>
+  auto splitter(O&&... outs)
+  {
+    return [=](auto& in_port) {
+        if (auto data = in_port.try_receive()) {
+          for (auto out : {outs...})
+            out.send(*data);
+        }
+    };
+  }
+
 
 } // namespace stateless
 
