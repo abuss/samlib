@@ -15,7 +15,8 @@ option(BUILD_TESTS "Build tests" ON)
 option(BUILD_DOCS "Build documentation" ON)
 option(BUILD_PYTHON_BINDING "Build python binding" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
-set(QUEUE_IMPLEMENTATION "mycqueue" CACHE STRING "Implementation of concurrent queue to use (concurrentqueue|atomic_queue)")
+# set(QUEUE_IMPLEMENTATION "mycqueue" CACHE STRING "Implementation of concurrent queue to use (concurrentqueue|atomic_queue)")
+set(QUEUE_IMPLEMENTATION "concurrentqueue" CACHE STRING "Implementation of concurrent queue to use (concurrentqueue|atomic_queue)")
 
 # set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
@@ -49,9 +50,10 @@ endif()
 target_link_libraries(samlib INTERFACE "-latomic")
 target_link_libraries(samlib INTERFACE ${COMMON_LINK_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
-set(CMAKE_CXX_STANDARD 17)
+# set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-message(STATUS "C++17 support has been enabled by default.")
+message(STATUS "C++30 support has been enabled by default.")
 
 target_include_directories(samlib INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
@@ -64,8 +66,8 @@ enable_testing()
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/samlib DESTINATION include)
 install(FILES ${PROJECT_SOURCE_DIR}/extern/mycqueue/mycqueue.hpp DESTINATION include)
 # Temporary added until C++20
-install(FILES ${PROJECT_SOURCE_DIR}/extern/jthread/source/jthread.hpp DESTINATION include)
-install(FILES ${PROJECT_SOURCE_DIR}/extern/jthread/source/stop_token.hpp DESTINATION include)
+# install(FILES ${PROJECT_SOURCE_DIR}/extern/jthread/source/jthread.hpp DESTINATION include)
+# install(FILES ${PROJECT_SOURCE_DIR}/extern/jthread/source/stop_token.hpp DESTINATION include)
 
 message(STATUS "-------------------------------")
 message(STATUS "++ Setup: ")

@@ -9,10 +9,9 @@
 auto my_generator = [](auto fn, auto& out)
 {
   using namespace std::literals::chrono_literals; 
-  size_t sum = 0;
 
-  return [fn,&out,&sum](auto& in_port) {
-    sum = 0;
+  return [fn,&out](auto& in_port) {
+    size_t sum = 0;
     if (auto data = in_port.receive()) {
       auto n = *data;
       while ((n > 0)) {
@@ -42,8 +41,6 @@ int main()
 {
  
   using env_t =  samlib::environment<>;
-
-  struct local_state { size_t sum=0; } lst;
 
   env_t env;
 

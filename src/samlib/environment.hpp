@@ -46,7 +46,7 @@ struct empty_state {};
 
 
     template <typename In, typename Fn>
-    agent_ref<agent<State, In>> make_agent(Fn&& fn, u_int nworkers=1)
+    agent_ref<agent<State, In>> make_agent(Fn fn, u_int nworkers=1)
     {
       using agent_t = agent<State, In>;
       agent_ref<agent<State, In>> ref(new agent_t(*static_cast<State*>(this), fn));
@@ -58,7 +58,7 @@ struct empty_state {};
 
 
     template <typename In, typename Fn>
-    agent_ref<stateless_agent<In>> make_stateless_agent(Fn&& fn, u_int nworkers=1)
+    agent_ref<stateless_agent<In>> make_stateless_agent(Fn fn, u_int nworkers=1)
     {
       using agent_t = stateless_agent<In>;
       agent_ref<stateless_agent<In>> ref(new agent_t(fn));

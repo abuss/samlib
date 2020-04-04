@@ -29,15 +29,15 @@ ExternalProject_Add(
 target_include_directories(samlib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/${QUEUE_IMPLEMENTATION})
 
 # Adding support for jthreads (coming in c++20)
-ExternalProject_Add(
-  jthread
-  GIT_REPOSITORY https://github.com/josuttis/jthread.git
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/jthread"
+# ExternalProject_Add(
+#   jthread
+#   GIT_REPOSITORY https://github.com/josuttis/jthread.git
+#   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/jthread"
   
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND ""
-  TEST_COMMAND ""
-  INSTALL_COMMAND ""
-  )
+#   CONFIGURE_COMMAND ""
+#   BUILD_COMMAND ""
+#   TEST_COMMAND ""
+#   INSTALL_COMMAND ""
+#   )
 
-target_include_directories(samlib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/jthread/source)
+# target_include_directories(samlib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/jthread/source)
