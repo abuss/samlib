@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7.0)
-project(samlib VERSION 0.1.0)
+project(samlib VERSION 0.2.0 LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "1")
 
@@ -30,9 +30,49 @@ endif(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE_SUFFIX)
 
 # External libraries (concurrent queue implementation)
-add_subdirectory(extern)
+# add_subdirectory(extern)
 
-include_directories(samlib INTERFACE src)
+include(cmake/CPM.cmake)
+
+message("which queue: ${QUEUE_IMPLEMENTATION}")
+
+if ("${QUEUE_IMPLEMENTATION}" STREQUAL "concurrentqueue")
+  set(GIT_REPO "cameron314/concurrentqueue")
+  set(VERSION 1.0.1)
+endif()
+
+if ("${QUEUE_IMPLEMENTATION}" STREQUAL "atomic_queue")
+  set(GIT_REPO "max0x7ba/atomic_queue")
+endif()
+
+if ("${QUEUE_IMPLEMENTATION}" STREQUAL "MPMCQueue")
+  set(GIT_REPO "rigtorp/MPMCQueue")
+endif()
+
+CPMAddPackage(
+  NAME ConcurrentQueue
+  GITHUB_REPOSITORY ${GIT_REPO}
+  VERSION ${VERSION}
+  DOWNLOAD_ONLY True
+)
+
+if (ConcurrentQueue_ADDED)
+  add_library(ConcurrentQueue INTERFACE IMPORTED)
+  include_directories(${ConcurrentQueue_SOURCE_DIR})
+endif()
+
+# PackageProject.cmake will be used to make our target installable
+CPMAddPackage(
+  NAME PackageProject.cmake
+  GITHUB_REPOSITORY TheLartians/PackageProject.cmake
+  VERSION 1.0
+)
+
+CPMAddPackage(
+  NAME doctest
+  GITHUB_REPOSITORY onqtam/doctest
+  GIT_TAG 2.3.7
+)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQUEUE_IMPLEMENTATION_${QUEUE_IMPLEMENTATION}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
@@ -53,21 +93,15 @@ target_link_libraries(samlib INTERFACE ${COMMON_LINK_LIBS} ${CMAKE_THREAD_LIBS_I
 # set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-message(STATUS "C++30 support has been enabled by default.")
+message(STATUS "C++20 support has been enabled by default.")
 
 target_include_directories(samlib INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-    $<INSTALL_INTERFACE:include>
 )
 
 include(CTest)
 enable_testing()
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/samlib DESTINATION include)
-install(FILES ${PROJECT_SOURCE_DIR}/extern/mycqueue/mycqueue.hpp DESTINATION include)
-# Temporary added until C++20
-# install(FILES ${PROJECT_SOURCE_DIR}/extern/jthread/source/jthread.hpp DESTINATION include)
-# install(FILES ${PROJECT_SOURCE_DIR}/extern/jthread/source/stop_token.hpp DESTINATION include)
 
 message(STATUS "-------------------------------")
 message(STATUS "++ Setup: ")
@@ -104,3 +138,14 @@ endif()
 if (BUILD_EXAMPLES)
  add_subdirectory(examples)
 endif()
+
+# ---- Create an installable target ----
+# this allows users to install and find the library via `find_package()`.
+
+packageProject(
+  NAME ${PROJECT_NAME}
+  VERSION ${PROJECT_VERSION}
+  BINARY_DIR ${PROJECT_BINARY_DIR}
+  INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src
+  INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
+)
