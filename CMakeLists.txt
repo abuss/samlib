@@ -97,6 +97,7 @@ message(STATUS "C++20 support has been enabled by default.")
 
 target_include_directories(samlib INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
 )
 
 include(CTest)
