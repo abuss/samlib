@@ -30,8 +30,15 @@ namespace samlib
     using executor_type = executor;
     using mailbox_type = mailbox<T>;
 
+    // base_agent() = default;
+
+    // base_agent(executor_type* exec)
+    //   : _executor(exec),
+    //     _owns_executor(false)
+    // { }
+
     ~base_agent() {
-      _mbox.close();
+      stop();
     }
 
     void start(uint num_workers = 1)
@@ -45,6 +52,11 @@ namespace samlib
     {
       _mbox.close();
       _executor.request_stop();
+    }
+
+    void wait()
+    {
+      _executor.join();
     }
 
     bool send(const T& value)

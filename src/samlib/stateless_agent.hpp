@@ -23,6 +23,8 @@ public:
     : task{fn}
   { }
 
+  virtual ~stateless_agent() { }
+  
   void run(std::stop_token st)
   {
     while (!st.stop_requested())

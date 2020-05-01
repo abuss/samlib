@@ -15,15 +15,15 @@ namespace samlib
       : ptr(nullptr)
     { }
 
+    virtual ~agent_ref() { }
+
     constexpr explicit agent_ref(agent_t* a)
       : ptr(a)
     { }
 
-    agent_ref(const agent_ref&) = default;
-    //   : ptr(other.ptr)
-    // { 
-    //   // printf("[COPY] agent_ref.ptr <- %lu\n",(size_t)ptr.get());
-    // }
+    agent_ref(agent_ref&& other) = default;
+
+    agent_ref(const agent_ref& other) = default;
 
     agent_ref& operator=(const agent_ref& other)
     { 
