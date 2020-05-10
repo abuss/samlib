@@ -6,5 +6,6 @@ macro(ADD_SAMLIB_TEST TEST_NAME TEST_SOURCE)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endmacro()
 
-ADD_SAMLIB_TEST(test_1 test1.cc)
-ADD_SAMLIB_TEST(test_2 test2.cc)
+ADD_SAMLIB_TEST(test1 test1.cc)
+ADD_SAMLIB_TEST(test2 test2.cc)
+ADD_SAMLIB_TEST(test3 test3.cc)

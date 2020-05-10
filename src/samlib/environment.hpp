@@ -45,17 +45,36 @@ struct empty_state {};
 
     using agent_def_t = std::unordered_map<std::string, agent_def_item>;
 
-    std::shared_ptr<State> _state = std::make_shared<State>();
-    std::shared_ptr<agent_def_t> agents;
-    bool autostart_agents = false;
-    int agent_counter = 0;
+    State*                       _state;
+    bool                         _own_state;
+    std::shared_ptr<agent_def_t> _agents;
+    
+    bool _autostart_agents = false;
+    int  _agent_counter = 0;
 
   public:
+    using state_type = State;
 
     environment(bool auto_start=true)
-      : autostart_agents(auto_start)
+      : _state(new State()),
+        _own_state(true),
+        _autostart_agents(auto_start)
     { 
-      agents = std::make_shared<agent_def_t>();
+      _agents = std::make_shared<agent_def_t>();
+    }
+
+    environment(State& state, bool auto_start=true)
+      : _state(&state),
+        _own_state(false),
+        _autostart_agents(auto_start)
+    { 
+      _agents = std::make_shared<agent_def_t>();
+    }
+
+    ~environment()
+    {
+      if (_own_state)
+        delete _state;
     }
 
     template <typename In>
@@ -71,9 +90,9 @@ struct empty_state {};
       using agent_t = agent<environment, In>;
       agent_ref<agent_t> ref(new agent_t(*this, fn));
       if (name.empty())
-        name = utility::genName(++agent_counter);
-      agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), nworkers});
-      if (autostart_agents)
+        name = utility::genName(++_agent_counter);
+      _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), nworkers});
+      if (_autostart_agents)
         ref.ref_agent().start(nworkers);
       return ref;
     }
@@ -85,9 +104,9 @@ struct empty_state {};
       using agent_t = stateless_agent<In>;
       agent_ref<agent_t> ref(new agent_t(fn));
       if (name.empty())
-        name = utility::genName(++agent_counter);
-      agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), nworkers});
-      if (autostart_agents)
+        name = utility::genName(++_agent_counter);
+      _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), nworkers});
+      if (_autostart_agents)
         ref.ref_agent().start(nworkers);
       return ref;
     }
@@ -97,9 +116,9 @@ struct empty_state {};
     agent_ref<A> create_agent(Args... args)
     {
       agent_ref<A> ref(new A(*this, args...));
-      std::string name = utility::genName(++agent_counter);
-      agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
-      if (autostart_agents)
+      std::string name = utility::genName(++_agent_counter);
+      _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
+      if (_autostart_agents)
         ref.ref_agent().start();
       return ref;
     }
@@ -110,9 +129,9 @@ struct empty_state {};
     {
       agent_ref<A> ref(new A(*this, args...));
       if (name.empty())
-        name = utility::genName(++agent_counter);
-      agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
-      if (autostart_agents)
+        name = utility::genName(++_agent_counter);
+      _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
+      if (_autostart_agents)
         ref.ref_agent().start();
       return ref;
     }
@@ -122,9 +141,9 @@ struct empty_state {};
     agent_ref<A> create_stateless_agent(Args... args)
     {
       agent_ref<A> ref(new A(args...));
-      std::string name = utility::genName(++agent_counter);
-      agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
-      if (autostart_agents)
+      std::string name = utility::genName(++_agent_counter);
+      _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
+      if (_autostart_agents)
         ref.ref_agent().start();
       return ref;
     }
@@ -134,9 +153,9 @@ struct empty_state {};
     {
       agent_ref<A> ref(new A(args...));
       if (name.empty())
-        name = utility::genName(++agent_counter);
-      agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
-      if (autostart_agents)
+        name = utility::genName(++_agent_counter);
+      _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
+      if (_autostart_agents)
         ref.ref_agent().start();
       return ref;
     }
@@ -144,34 +163,34 @@ struct empty_state {};
     template<typename A>
     agent_ref<A> get_agent_ref(std::string name)
     {
-      if (agents->contains(name))
-        return std::any_cast<agent_ref<A>>(agents->operator[](name).ref);
+      if (_agents->contains(name))
+        return std::any_cast<agent_ref<A>>(_agents->operator[](name).ref);
       return agent_ref<A>(nullptr);
-    }
-
-    State& state() {
-      return *_state;
     }
 
     State& state() const {
       return *_state;
     }
 
+    const State& get_state() const {
+      return *_state;
+    }
+
     void start_agents()
     {
-      // for(auto& a : agents)
-        // a.executor->start();
+      for(const auto& a : _agents)
+        a.executor->start();
     }
 
     void wait_for_agents()
     {
-      for(auto& a : *agents)
+      for(auto& a : *_agents)
         a.second.executor->join();
     }
 
     void stop_agents()
     {
-      for(auto& a : *agents) {
+      for(auto& a : *_agents) {
           a.second.executor->request_stop();
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(10));

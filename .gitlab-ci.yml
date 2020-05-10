@@ -11,8 +11,9 @@ build:
   stage: build
   artifacts:
    paths:
-    - build/test/test_1
-    - build/test/test_2
+    - build/test/test1
+    - build/test/test2
+    - build/test/test3
     - build/examples/* 
   script:
     - cd build; cmake .. -DCMAKE_CXX_COMPILER=g++-10; make
@@ -21,10 +22,12 @@ test:
   stage: test
   artifacts:
    paths:
-    - build/test/test_1
-    - build/test/test_2
+    - build/test/test1
+    - build/test/test2
+    - build/test/test3
     - build/examples/* 
   script:
-    - build/test/test_1
-    - build/test/test_2
+    - build/test/test1
+    - build/test/test2
+    - build/test/test3
     - build/examples/example5
