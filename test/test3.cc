@@ -53,6 +53,7 @@ TEST_CASE("external state") {
     sleep(1);
     env.stop_agents();
 
+    my_state = env.get_state();
     CHECK(my_state.res3 == 6.904);
   }
 

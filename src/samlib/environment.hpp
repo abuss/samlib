@@ -45,8 +45,7 @@ struct empty_state {};
 
     using agent_def_t = std::unordered_map<std::string, agent_def_item>;
 
-    State*                       _state;
-    bool                         _own_state;
+    std::shared_ptr<State>       _state;
     std::shared_ptr<agent_def_t> _agents;
     
     bool _autostart_agents = false;
@@ -56,26 +55,19 @@ struct empty_state {};
     using state_type = State;
 
     environment(bool auto_start=true)
-      : _state(new State()),
-        _own_state(true),
-        _autostart_agents(auto_start)
+      : _autostart_agents(auto_start)
     { 
+      _state = std::make_shared<State>();
       _agents = std::make_shared<agent_def_t>();
     }
 
-    environment(State& state, bool auto_start=true)
-      : _state(&state),
-        _own_state(false),
-        _autostart_agents(auto_start)
+    environment(const State& state, bool auto_start=true)
+      : _autostart_agents(auto_start)
     { 
+      _state = std::make_shared<State>(state);
       _agents = std::make_shared<agent_def_t>();
     }
 
-    ~environment()
-    {
-      if (_own_state)
-        delete _state;
-    }
 
     template <typename In>
     using agent_ref_type = agent_ref<agent<environment, In>>;
@@ -174,12 +166,6 @@ struct empty_state {};
 
     const State& get_state() const {
       return *_state;
-    }
-
-    void start_agents()
-    {
-      for(const auto& a : _agents)
-        a.executor->start();
     }
 
     void wait_for_agents()
