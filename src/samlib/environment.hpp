@@ -179,7 +179,8 @@ struct empty_state {};
       for(auto& a : *_agents) {
           a.second.executor->request_stop();
       }
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      // Extra time required to let the threads get informed about the stop request
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
   };
 
