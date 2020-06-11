@@ -52,7 +52,7 @@ namespace samlib
     {
       value_type value;
       while (!this->try_dequeue(value)) {
-        std::this_thread::sleep_for(5ms);
+        std::this_thread::sleep_for(10us);
         if (stop_flag)
           return std::nullopt;
       }

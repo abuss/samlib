@@ -76,8 +76,8 @@ int main()
   using ref_ping_t = samlib::agent_ref<ping_t>;
   using ref_pong_t = samlib::agent_ref<pong_t>;
 
-  ref_ping_t p1(new ping_t(st, ping()));
-  ref_pong_t p2(new pong_t(st, pong()));
+  ref_ping_t p1(std::make_shared<ping_t>(st, ping()));
+  ref_pong_t p2(std::make_shared<pong_t>(st, pong()));
 
   p1.ref_agent().set_output(p2.ref_agent());
   p2.ref_agent().set_output(p1.ref_agent());

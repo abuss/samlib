@@ -17,7 +17,7 @@ namespace samlib
 
     virtual ~agent_ref() { }
 
-    constexpr explicit agent_ref(agent_t* a)
+    constexpr explicit agent_ref(std::shared_ptr<agent_t> a)
       : ptr(a)
     { }
 
@@ -70,4 +70,4 @@ namespace samlib
     }
   };
 
-}
+} // namespace samlib

@@ -61,8 +61,8 @@ int main()
 
   agent_ref_t p1,p2;
 
-  p1 = agent_ref_t(new agent_t(ping, p2));
-  p2 = agent_ref_t(new agent_t(pong, p1));
+  p1 = agent_ref_t(std::make_shared<agent_t>(ping, p2));
+  p2 = agent_ref_t(std::make_shared<agent_t>(pong, p1));
 
   p1.start();
   p2.start();

@@ -80,7 +80,7 @@ struct empty_state {};
     agent_ref<agent<environment, In>> make_agent(Fn fn, std::string name = "", u_int nworkers = 1)
     {
       using agent_t = agent<environment, In>;
-      agent_ref<agent_t> ref(new agent_t(*this, fn));
+      agent_ref<agent_t> ref(std::make_shared<agent_t>(*this, fn));
       if (name.empty())
         name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), nworkers});
@@ -94,7 +94,7 @@ struct empty_state {};
     agent_ref<stateless_agent<In>> make_stateless_agent(Fn fn, std::string name = "", u_int nworkers=1)
     {
       using agent_t = stateless_agent<In>;
-      agent_ref<agent_t> ref(new agent_t(fn));
+      agent_ref<agent_t> ref(std::make_shared<agent_t>(fn));
       if (name.empty())
         name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), nworkers});
@@ -107,7 +107,7 @@ struct empty_state {};
     template<typename A, typename... Args>
     agent_ref<A> create_agent(Args... args)
     {
-      agent_ref<A> ref(new A(*this, args...));
+      agent_ref<A> ref(std::make_shared<A>(*this, args...));
       std::string name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
       if (_autostart_agents)
@@ -119,7 +119,7 @@ struct empty_state {};
     template<typename A, typename... Args>
     agent_ref<A> create_agent_named(std::string name, Args... args)
     {
-      agent_ref<A> ref(new A(*this, args...));
+      agent_ref<A> ref(std::make_shared<A>(*this, args...));
       if (name.empty())
         name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
@@ -132,7 +132,7 @@ struct empty_state {};
     template<typename A, typename... Args>
     agent_ref<A> create_stateless_agent(Args... args)
     {
-      agent_ref<A> ref(new A(args...));
+      agent_ref<A> ref(std::make_shared<A>(args...));
       std::string name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
       if (_autostart_agents)
@@ -143,7 +143,7 @@ struct empty_state {};
     template<typename A, typename... Args>
     agent_ref<A> create_stateless_agent_named(std::string name, Args... args)
     {
-      agent_ref<A> ref(new A(args...));
+      agent_ref<A> ref(std::make_shared<A>(args...));
       if (name.empty())
         name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
