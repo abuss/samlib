@@ -50,6 +50,7 @@ struct empty_state {};
     
     bool _autostart_agents = false;
     int  _agent_counter = 0;
+    bool _in_use = false;
 
   public:
     using state_type = State;
@@ -84,8 +85,10 @@ struct empty_state {};
       if (name.empty())
         name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), nworkers});
-      if (_autostart_agents)
+      if (_autostart_agents) {
+        _in_use = true;
         ref.ref_agent().start(nworkers);
+      }
       return ref;
     }
 
@@ -98,8 +101,10 @@ struct empty_state {};
       if (name.empty())
         name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), nworkers});
-      if (_autostart_agents)
+      if (_autostart_agents) {
+        _in_use = true;
         ref.ref_agent().start(nworkers);
+      }
       return ref;
     }
 
@@ -110,8 +115,10 @@ struct empty_state {};
       agent_ref<A> ref(std::make_shared<A>(*this, args...));
       std::string name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
-      if (_autostart_agents)
+      if (_autostart_agents) {
+        _in_use = true;
         ref.ref_agent().start();
+      }
       return ref;
     }
 
@@ -123,8 +130,10 @@ struct empty_state {};
       if (name.empty())
         name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
-      if (_autostart_agents)
+      if (_autostart_agents) {
+        _in_use = true;
         ref.ref_agent().start();
+      }
       return ref;
     }
 
@@ -135,8 +144,10 @@ struct empty_state {};
       agent_ref<A> ref(std::make_shared<A>(args...));
       std::string name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
-      if (_autostart_agents)
+      if (_autostart_agents) {
+        _in_use = true;
         ref.ref_agent().start();
+      }
       return ref;
     }
 
@@ -147,8 +158,10 @@ struct empty_state {};
       if (name.empty())
         name = utility::genName(++_agent_counter);
       _agents->operator[](name) = agent_def_item({ref, ref.ref_agent().get_executor(), 1});
-      if (_autostart_agents)
+      if (_autostart_agents) {
+        _in_use = true;
         ref.ref_agent().start();
+      }
       return ref;
     }
 
@@ -174,13 +187,24 @@ struct empty_state {};
         a.second.executor->join();
     }
 
+    void activate()
+    {
+      _in_use = true;
+    }
+
     void stop_agents()
     {
+      _in_use = false;
       for(auto& a : *_agents) {
           a.second.executor->request_stop();
       }
       // Extra time required to let the threads get informed about the stop request
       std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+
+    bool active() const
+    {
+      return _in_use;
     }
   };
 

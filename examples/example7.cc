@@ -10,11 +10,11 @@ auto my_generator = [](auto fn, auto& out)
 {
   using namespace std::literals::chrono_literals; 
 
-  return [fn,&out](auto& in_port) {
+  return [fn,&out](auto& env, auto& in_port) {
     size_t sum = 0;
     if (auto data = in_port.receive()) {
       auto n = *data;
-      while ((n > 0)) {
+      while (n > 0 && env.active()) {
         auto val = fn(n);
         sum += val;
         out.send(val);
@@ -44,15 +44,15 @@ int main()
 
   env_t env;
 
-  env_t::stateless_agent_ref_type<size_t> p1;
+  env_t::agent_ref_type<size_t> p1;
   env_t::agent_ref_type<size_t> p2;
 
-  p1 = env.make_stateless_agent<size_t>(my_generator(gen,p2));
+  p1 = env.make_agent<size_t>(my_generator(gen,p2));
   p2 = env.make_agent<size_t>(samlib::sink(hole));
 
   // st.start_agents();
 
-  p1.send(10000);
+  p1.send(1000000);
 
   sleep(1);
 
