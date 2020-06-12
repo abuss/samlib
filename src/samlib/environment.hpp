@@ -180,7 +180,7 @@ struct empty_state {};
           a.second.executor->request_stop();
       }
       // Extra time required to let the threads get informed about the stop request
-      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
   };
 
