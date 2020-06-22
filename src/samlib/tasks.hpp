@@ -31,10 +31,10 @@ namespace samlib
   template<typename Fn, typename O>
   auto generator(Fn fn, O& out)
   {
-    return [fn,&out](auto&, auto& in_port) {
+    return [fn,&out](const auto& env, auto& in_port) {
         if (auto dat = in_port.try_receive()) {
           auto n = *dat;
-          while ((n > 0)) {
+          while ((n > 0) && env.active()) {
             out.send(fn(n));
             --n;
           }
@@ -45,10 +45,10 @@ namespace samlib
   template<typename Fn, typename O>
   auto generator(Fn fn, O&& out)
   {
-    return [fn,out](auto&, auto& in_port) {
+    return [fn,out](const auto& env, auto& in_port) {
         if (auto dat = in_port.try_receive()) {
           auto n = *dat;
-          while ((n > 0)) {
+          while ((n > 0) && env.active()) {
             out.send(fn(n));
             --n;
           }
