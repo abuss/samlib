@@ -5,12 +5,11 @@
 namespace samlib
 {
 
-template <typename Tin>
+template<typename Tin>
 class stateless_agent
   : public base_agent<Tin>
 {
 protected:
-
   using base_t = base_agent<Tin>;
   using task_t = std::function<void(typename base_t::mailbox_type&)>;
 
@@ -24,11 +23,10 @@ public:
   { }
 
   virtual ~stateless_agent() { }
-  
+
   void run(std::stop_token st)
   {
-    while (!st.stop_requested())
-    {
+    while (!st.stop_requested()) {
       task(this->mbox());
     }
   }
@@ -37,7 +35,6 @@ public:
   {
     return agent_ref_type(this);
   }
-
 };
 
 

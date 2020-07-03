@@ -5,12 +5,11 @@
 namespace samlib
 {
 
-template <typename State, typename Tin>
+template<typename State, typename Tin>
 class agent
   : public base_agent<Tin>
 {
 protected:
-
   using base_t = base_agent<Tin>;
   using task_t = std::function<void(State&, typename base_t::mailbox_type&)>;
 
@@ -31,8 +30,7 @@ public:
 
   void run(std::stop_token st)
   {
-    while (!st.stop_requested())
-    {
+    while (!st.stop_requested()) {
       task(*state, this->mbox());
     }
   }
@@ -41,7 +39,6 @@ public:
   {
     return agent_ref_type(this);
   }
-
 };
 
 

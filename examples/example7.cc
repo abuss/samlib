@@ -6,11 +6,10 @@
 #include <samlib/environment.hpp>
 
 
-auto my_generator = [](auto fn, auto& out)
-{
-  using namespace std::literals::chrono_literals; 
+auto my_generator = [](auto fn, auto& out) {
+  using namespace std::literals::chrono_literals;
 
-  return [fn,&out](auto& env, auto& in_port) {
+  return [fn, &out](auto& env, auto& in_port) {
     size_t sum = 0;
     if (auto data = in_port.receive()) {
       auto n = *data;
@@ -21,7 +20,7 @@ auto my_generator = [](auto fn, auto& out)
         --n;
       }
     }
-    printf("Sum: %lu\n",sum);
+    printf("Sum: %lu\n", sum);
   };
 };
 
@@ -39,15 +38,15 @@ size_t gen(size_t val)
 
 int main()
 {
- 
-  using env_t =  samlib::environment<>;
+
+  using env_t = samlib::environment<>;
 
   env_t env;
 
   env_t::agent_ref_type<size_t> p1;
   env_t::agent_ref_type<size_t> p2;
 
-  p1 = env.make_agent<size_t>(my_generator(gen,p2));
+  p1 = env.make_agent<size_t>(my_generator(gen, p2));
   p2 = env.make_agent<size_t>(samlib::sink(hole));
 
   // st.start_agents();
@@ -59,7 +58,6 @@ int main()
   printf("------------ Time's up ---------------\n");
 
   env.stop_agents();
-  
-  printf("------------ Clean up ---------------\n");
 
+  printf("------------ Clean up ---------------\n");
 }

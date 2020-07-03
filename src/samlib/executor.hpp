@@ -8,17 +8,16 @@ namespace samlib
 
 class executor
 {
-  std::vector<std::jthread>  workers;
+  std::vector<std::jthread> workers;
 
 public:
-
   executor() noexcept
   { }
 
-  template<class F, class... Args> 
+  template<class F, class... Args>
   explicit executor(F&& f, uint num_workers, Args&&... args)
   {
-    for(uint i=0; i < num_workers; ++i) {
+    for (uint i = 0; i < num_workers; ++i) {
       workers.emplace_back(std::forward<F>(f), std::forward<Args>(args)...);
     }
   }
@@ -41,7 +40,6 @@ public:
     for (auto& wrk : workers)
       wrk.detach();
   }
-
 };
 
 

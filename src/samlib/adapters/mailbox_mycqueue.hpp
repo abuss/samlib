@@ -12,72 +12,71 @@
 
 namespace samlib
 {
- 
-  template<typename T>
-  class mailbox
-    : mycqueue<T>
+
+template<typename T>
+class mailbox
+  : mycqueue<T>
+{
+
+  using base_t = mycqueue<T>;
+  bool stop_flag = false;
+
+public:
+  mailbox(size_t capacity_ = 64)
+    : base_t(capacity_)
+  { }
+
+  void stop(bool flag)
   {
+    stop_flag = flag;
+  }
 
-    using base_t = mycqueue<T>;
-    bool stop_flag = false;
+  size_t size_approx() const
+  {
+    return base_t::approx_size();
+  }
 
-  public:
+  typedef T value_type;
 
-    mailbox(size_t capacity_=64)
-      : base_t(capacity_)
-    { }
-
-    void stop(bool flag)
-    {
-      stop_flag = flag; 
+  bool send(const value_type& value)
+  {
+    if (!stop_flag) {
+      this->push(value);
+      return true;
     }
+    return false;
+  }
 
-    size_t size_approx() const
-    {
-      return base_t::approx_size();
+  bool send(value_type&& value)
+  {
+    if (!stop_flag) {
+      this->push(std::forward<value_type>(value));
+      return true;
     }
-        
-    typedef T value_type;
+    return false;
+  }
 
-    bool send(const value_type& value)
-    {
-      if (!stop_flag) {
-        this->push(value);
-        return true;
-      }
-      return false;
+  std::optional<value_type> receive()
+  {
+    if (!stop_flag) {
+      return this->pop();
     }
+    return std::nullopt;
+  }
 
-    bool send(value_type&& value)
-    {
-      if (!stop_flag) {
-        this->push(std::forward<value_type>(value));
-        return true;
-      }
-      return false;
-    }
+  std::optional<value_type> try_receive()
+  {
+    value_type value;
+    if (!stop_flag && this->try_pop(value))
+      return std::make_optional(std::move(value));
+    return std::nullopt;
+  }
 
-    std::optional<value_type> receive()
-    {
-      if (!stop_flag) {
-        return this->pop();
-      }
-      return std::nullopt;
-    }
-    
-    std::optional<value_type> try_receive()
-    {
-      value_type value;
-      if (!stop_flag && this->try_pop(value))
-        return std::make_optional(std::move(value));
-      return std::nullopt;
-    }
-
-    void close() {
-      stop_flag = true;
-      base_t::close();
-    }
-
-  };
+  void close()
+  {
+    stop_flag = true;
+    base_t::close();
+  }
+};
 
 }

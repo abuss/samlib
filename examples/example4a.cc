@@ -21,15 +21,15 @@ size_t pong(size_t val)
 
 int main()
 {
-  using env_t =  samlib::environment<>;
+  using env_t = samlib::environment<>;
 
   env_t env;
 
   using agent_t = samlib::stateless_agent<size_t>;
   samlib::agent_ref<agent_t> p1, p2;
 
-  p1 = env.create_stateless_agent<agent_t>(samlib::stateless::transform(ping,p2));
-  p2 = env.create_stateless_agent<agent_t>(samlib::stateless::transform(pong,p1));
+  p1 = env.create_stateless_agent<agent_t>(samlib::stateless::transform(ping, p2));
+  p2 = env.create_stateless_agent<agent_t>(samlib::stateless::transform(pong, p1));
 
   sleep(1);
 

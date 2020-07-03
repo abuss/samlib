@@ -1,0 +1,26 @@
+BasedOnStyle: WebKit
+AccessModifierOffset: -2
+AlignAfterOpenBracket: DontAlign
+AlignConsecutiveDeclarations: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortFunctionsOnASingleLine: Empty
+AlignTrailingComments: true
+BraceWrapping:
+  AfterClass: true
+  AfterStruct: true
+  AfterFunction: true
+  AfterNamespace: true
+  SplitEmptyRecord: false
+BreakBeforeBraces: Custom
+BreakConstructorInitializers: BeforeColon
+ColumnLimit: 0
+ContinuationIndentWidth: 0
+ConstructorInitializerIndentWidth: 2
+Cpp11BracedListStyle: true
+MaxEmptyLinesToKeep: 2
+SortIncludes: false
+SpaceBeforeInheritanceColon: false
+SpaceInEmptyBlock: true
+SpaceAfterTemplateKeyword: false
+SpaceBeforeCpp11BracedList: false
+IndentWidth: 2

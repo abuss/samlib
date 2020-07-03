@@ -10,20 +10,25 @@
 struct payload
 {
   std::vector<size_t> data;
-  size_t n=0;
+  size_t              n = 0;
 
-  payload(size_t sz) : data(sz), n(0) {}
+  payload(size_t sz)
+    : data(sz), n(0) { }
 
-  payload() : n(0) {}
+  payload()
+    : n(0) { }
 
-  bool is_valid() const { return !data.empty(); }
+  bool is_valid() const
+  {
+    return !data.empty();
+  }
 };
 
 payload ping(payload val)
 {
   val.n++;
   if (val.is_valid())
-    printf("Ping -> %lu (%lu)\n", ++val.data[0],val.n);
+    printf("Ping -> %lu (%lu)\n", ++val.data[0], val.n);
   return val;
 }
 
@@ -38,15 +43,15 @@ payload pong(payload val)
 
 int main()
 {
- 
+
   using env_t = samlib::environment<>;
-  
+
   env_t env;
 
-  env_t::agent_ref_type<payload> p1,p2;
+  env_t::agent_ref_type<payload> p1, p2;
 
-  p1 = env.make_agent<payload>(samlib::transform(ping,p2));
-  p2 = env.make_agent<payload>(samlib::transform(pong,p1));
+  p1 = env.make_agent<payload>(samlib::transform(ping, p2));
+  p2 = env.make_agent<payload>(samlib::transform(pong, p1));
 
   // st.start_agents();
 

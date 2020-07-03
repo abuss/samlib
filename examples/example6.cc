@@ -20,19 +20,18 @@ size_t gen(size_t val)
 
 int main()
 {
-  using env_t =  samlib::environment<>;
+  using env_t = samlib::environment<>;
 
-  env_t env;
-  env_t::stateless_agent_ref_type<size_t> p1,p2;
+  env_t                                   env;
+  env_t::stateless_agent_ref_type<size_t> p1, p2;
 
-  p1 = env.make_stateless_agent<size_t>(samlib::stateless::generator(gen,p2));
+  p1 = env.make_stateless_agent<size_t>(samlib::stateless::generator(gen, p2));
   p2 = env.make_stateless_agent<size_t>(samlib::stateless::sink(hole));
 
   p1.send(100000);
 
   sleep(1);
-  
+
   printf("------------ Time's up ---------------\n");
   env.stop_agents();
-
 }

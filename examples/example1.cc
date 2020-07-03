@@ -9,7 +9,7 @@ template<typename State, typename T, typename Task>
 struct ping_pong_agent
   : public samlib::base_agent<T>
 {
-  State*                  state;
+  State* state;
 
   using agent_ref_t = samlib::base_agent<T>;
 
@@ -41,7 +41,6 @@ struct ping_pong_agent
       output->send(*new_data);
     }
   }
-
 };
 
 
@@ -49,7 +48,7 @@ struct ping
 {
   std::optional<double> operator()(double val)
   {
-    printf("Ping -> %f\n",val++);
+    printf("Ping -> %f\n", val++);
     return val;
   }
 };
@@ -59,7 +58,7 @@ struct pong
 {
   std::optional<double> operator()(double val)
   {
-    printf("%f <- Pong\n",val++);
+    printf("%f <- Pong\n", val++);
     return val;
   }
 };
@@ -67,11 +66,12 @@ struct pong
 
 int main()
 {
-  struct state { };  
+  struct state
+  { };
   state st;
-  
-  using ping_t = ping_pong_agent<state,double,ping>;
-  using pong_t = ping_pong_agent<state,double,pong>;
+
+  using ping_t = ping_pong_agent<state, double, ping>;
+  using pong_t = ping_pong_agent<state, double, pong>;
 
   using ref_ping_t = samlib::agent_ref<ping_t>;
   using ref_pong_t = samlib::agent_ref<pong_t>;
@@ -96,5 +96,4 @@ int main()
   p1.stop();
   p2.stop();
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
 }

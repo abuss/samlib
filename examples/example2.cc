@@ -6,7 +6,7 @@
 #include <samlib/agent_ref.hpp>
 
 
-template<typename Tin, typename Tout=Tin>
+template<typename Tin, typename Tout = Tin>
 struct ping_pong_agent
   : public samlib::base_agent<Tin>
 {
@@ -20,8 +20,8 @@ struct ping_pong_agent
   dest_agent_t& out;
 
   constexpr ping_pong_agent(ntask_t&& fn, dest_agent_t& d)
-  : ntask{fn},
-    out(d)
+    : ntask{fn},
+      out(d)
   { }
 
   agent_ref_type ref() noexcept
@@ -42,15 +42,15 @@ struct ping_pong_agent
 
 double ping(double val)
 {
-    printf("Ping -> %f\n",val++);
-    return val;
+  printf("Ping -> %f\n", val++);
+  return val;
 }
 
 
 double pong(double val)
 {
-    printf("%f <- Pong\n",val++);
-    return val;
+  printf("%f <- Pong\n", val++);
+  return val;
 }
 
 
@@ -59,7 +59,7 @@ int main()
   using agent_t = ping_pong_agent<double>;
   using agent_ref_t = agent_t::agent_ref_type;
 
-  agent_ref_t p1,p2;
+  agent_ref_t p1, p2;
 
   p1 = agent_ref_t(std::make_shared<agent_t>(ping, p2));
   p2 = agent_ref_t(std::make_shared<agent_t>(pong, p1));
@@ -77,5 +77,4 @@ int main()
 
   p1.stop();
   p2.stop();
-
 }

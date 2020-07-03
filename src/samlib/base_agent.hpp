@@ -10,81 +10,80 @@
 namespace samlib
 {
 
-  template <typename T>
-  class base_agent
+template<typename T>
+class base_agent
+{
+protected:
+  inline std::optional<T> receive()
   {
-  protected:
+    return _mbox.receive();
+  }
 
-    inline std::optional<T> receive()
-    {
-      return _mbox.receive();
-    }
+  inline std::optional<T> try_receive()
+  {
+    return _mbox.try_receive();
+  }
 
-    inline std::optional<T> try_receive()
-    {
-      return _mbox.try_receive();
-    }
+public:
+  using executor_type = executor;
+  using mailbox_type = mailbox<T>;
 
-  public:
+  // base_agent() = default;
 
-    using executor_type = executor;
-    using mailbox_type = mailbox<T>;
+  // base_agent(executor_type* exec)
+  //   : _executor(exec),
+  //     _owns_executor(false)
+  // { }
 
-    // base_agent() = default;
+  ~base_agent()
+  {
+    stop();
+  }
 
-    // base_agent(executor_type* exec)
-    //   : _executor(exec),
-    //     _owns_executor(false)
-    // { }
+  void start(uint num_workers = 1)
+  {
+    _executor = executor([&](std::stop_token st) {
+      this->run(st);
+    },
+    num_workers);
+  }
 
-    ~base_agent() {
-      stop();
-    }
+  void stop()
+  {
+    _mbox.close();
+    _executor.request_stop();
+  }
 
-    void start(uint num_workers = 1)
-    {
-      _executor = executor([&](std::stop_token st) {
-          this->run(st); 
-        }, num_workers);
-    }
+  void wait()
+  {
+    _executor.join();
+  }
 
-    void stop()
-    {
-      _mbox.close();
-      _executor.request_stop();
-    }
+  bool send(const T& value)
+  {
+    return _mbox.send(value);
+  }
 
-    void wait()
-    {
-      _executor.join();
-    }
+  bool send(T&& value)
+  {
+    return _mbox.send(std::forward<T>(value));
+  }
 
-    bool send(const T& value)
-    {
-      return _mbox.send(value);
-    }
+  executor_type* get_executor()
+  {
+    return &_executor;
+  }
 
-    bool send(T&& value)
-    {
-      return _mbox.send(std::forward<T>(value));
-    }
+  mailbox_type& mbox()
+  {
+    return _mbox;
+  }
 
-    executor_type* get_executor() {
-      return &_executor;
-    }
+  virtual void run(std::stop_token st) = 0;
 
-    mailbox_type& mbox()
-    {
-      return _mbox;
-    }
-
-    virtual void run(std::stop_token st) = 0;
-
-  private:
-
-    executor_type  _executor;
-    mailbox_type   _mbox;
-
-  };
+private:
+  executor_type _executor;
+  mailbox_type  _mbox;
+};
 
 } // namespace samlib
