@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.7.0)
-project(samlib VERSION 0.2.2 LANGUAGES CXX)
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS "1")
 
 set(PROJECT_AUTHOR "Antal Buss")
 set(PROJECT_AUTHOR_EMAIL "antal.buss@gmail.com")
+
+project(samlib VERSION 0.2.3 LANGUAGES CXX)
+
+add_library(samlib INTERFACE)
+target_compile_features(samlib INTERFACE cxx_std_20)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS "1")
 
 message("*")
 message("* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
@@ -19,9 +23,6 @@ option(BUILD_EXAMPLES "Build examples" ON)
 set(QUEUE_IMPLEMENTATION "concurrentqueue" CACHE STRING "Implementation of concurrent queue to use (concurrentqueue|atomic_queue)")
 
 # set(CMAKE_VERBOSE_MAKEFILE TRUE)
-
-
-add_library(samlib INTERFACE)
 
 # If no build type is set, set to release.
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
@@ -75,6 +76,7 @@ CPMAddPackage(
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQUEUE_IMPLEMENTATION_${QUEUE_IMPLEMENTATION}")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQUEUE_IMPLEMENTATION_${QUEUE_IMPLEMENTATION} -static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive ")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -pedantic")
 

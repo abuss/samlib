@@ -52,7 +52,7 @@ struct engine
     p2 = env.make_agent<size_t>(samlib::sink(_sink));
   }
 
-  void run_for(int n, int t)
+  void run_for(size_t n, u_int t)
   {
     auto p1 = env.template get_agent_ref<samlib::stateless_agent<size_t>>("_1");
     // auto p2 = env.template get_agent_ref<samlib::agent<env_t, size_t>>("_2");

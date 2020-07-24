@@ -27,6 +27,7 @@ protected:
 public:
   using executor_type = executor;
   using mailbox_type = mailbox<T>;
+  using message_type = T;
 
   // base_agent() = default;
 
@@ -35,7 +36,7 @@ public:
   //     _owns_executor(false)
   // { }
 
-  ~base_agent()
+  virtual ~base_agent()
   {
     stop();
   }

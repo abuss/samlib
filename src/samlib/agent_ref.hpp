@@ -8,6 +8,7 @@ class agent_ref
 {
   using agent_t = A;
   std::shared_ptr<agent_t> ptr;
+  using message_t = typename agent_t::message_type;
 
 public:
   constexpr agent_ref()
@@ -36,16 +37,14 @@ public:
     return *this;
   }
 
-  template<typename T>
-  constexpr bool send(const T& value) const
+  constexpr bool send(const message_t& value) const
   {
     return ptr->send(value);
   }
 
-  template<typename T>
-  constexpr bool send(T&& value) const
+  constexpr bool send(message_t&& value) const
   {
-    return ptr->send(value);
+    return ptr->send(std::forward<message_t>(value));
   }
 
   void start() const
