@@ -19,7 +19,7 @@ protected:
 public:
   using agent_ref_type = agent_ref<agent>;
 
-  constexpr agent(State& gstate)
+  constexpr explicit agent(State& gstate)
     : state{&gstate}
   { }
 
@@ -28,9 +28,9 @@ public:
       task{fn}
   { }
 
-  virtual ~agent() { }
+  virtual ~agent() = default;
 
-  void run(std::stop_token st)
+  void run(const std::stop_token& st)
   {
     while (!st.stop_requested()) {
       task(*state, this->mbox());

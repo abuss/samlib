@@ -28,9 +28,9 @@ TEST_CASE("testing base_agent") {
   struct my_agent
     : public samlib::base_agent<double>
   {
-    my_agent() {};
+    my_agent() = default;
 
-    void run(std::stop_token)
+    void run(const std::stop_token&) override
     {
       auto dat = this->try_receive();
       CHECK(dat == std::nullopt);

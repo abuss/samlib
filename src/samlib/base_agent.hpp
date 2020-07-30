@@ -80,7 +80,7 @@ public:
     return _mbox;
   }
 
-  virtual void run(std::stop_token st) = 0;
+  virtual void run(const std::stop_token& st) = 0;
 
 private:
   executor_type _executor;

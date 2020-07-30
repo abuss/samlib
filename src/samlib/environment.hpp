@@ -59,7 +59,7 @@ class environment
 public:
   using state_type = State;
 
-  environment(bool auto_start = true)
+  explicit environment(bool auto_start = true)
     : _autostart_agents(auto_start)
   {
     _state = std::make_shared<State>();

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.7.0)
 set(PROJECT_AUTHOR "Antal Buss")
 set(PROJECT_AUTHOR_EMAIL "antal.buss@gmail.com")
 
-project(samlib VERSION 0.2.3 LANGUAGES CXX)
+project(samlib VERSION 0.2.4 LANGUAGES CXX)
 
 add_library(samlib INTERFACE)
 target_compile_features(samlib INTERFACE cxx_std_20)

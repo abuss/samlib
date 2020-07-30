@@ -33,7 +33,7 @@ struct ping_pong_agent
     output = &out;
   }
 
-  void run(std::stop_token stoken)
+  void run(const std::stop_token& stoken) override
   {
     while (!stoken.stop_requested()) {
       auto data = this->receive();

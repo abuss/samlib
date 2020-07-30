@@ -14,9 +14,9 @@ struct my_agent
 {
   S* env;
 
-  my_agent(S& e) : env(&e) {};
+  explicit my_agent(S& e) : env(&e) {};
 
-  void run(std::stop_token)
+  void run(const std::stop_token&) override
   {
    
     auto dat = this->receive();
@@ -42,7 +42,7 @@ TEST_CASE("external state") {
   
     using env_t = samlib::environment<state>;
 
-    state my_state;
+    state my_state = state();
     env_t env(my_state);
 
     auto a = env.create_agent<my_agent<env_t>>();

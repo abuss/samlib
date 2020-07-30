@@ -18,13 +18,13 @@ protected:
 public:
   using agent_ref_type = agent_ref<stateless_agent>;
 
-  constexpr stateless_agent(task_t fn)
+  constexpr explicit stateless_agent(task_t fn)
     : task{fn}
   { }
 
-  virtual ~stateless_agent() { }
+  virtual ~stateless_agent() = default;
 
-  void run(std::stop_token st)
+  void run(const std::stop_token& st)
   {
     while (!st.stop_requested()) {
       task(this->mbox());

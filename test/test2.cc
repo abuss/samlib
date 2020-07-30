@@ -12,7 +12,7 @@ struct my_stateless_agent
 {
   my_stateless_agent() {};
 
-  void run(std::stop_token)
+  void run(const std::stop_token&)
   {
     auto dat = this->try_receive();
     CHECK(dat == std::nullopt);
@@ -38,7 +38,7 @@ struct my_agent
 
   my_agent(S& e) : env(&e) {};
 
-  void run(std::stop_token)
+  void run(const std::stop_token&) override
   {
     auto dat = this->try_receive();
     CHECK(dat == std::nullopt);

@@ -29,7 +29,7 @@ struct ping_pong_agent
     return agent_ref_type(this);
   }
 
-  void run(std::stop_token st) override
+  void run(const std::stop_token& st) override
   {
     while (!st.stop_requested()) {
       auto data = this->receive();

@@ -21,7 +21,7 @@ public:
     : ptr(a)
   { }
 
-  agent_ref(agent_ref&& other) = default;
+  agent_ref(agent_ref&& other) noexcept = default;
 
   agent_ref(const agent_ref& other) = default;
 
@@ -31,7 +31,7 @@ public:
     return *this;
   }
 
-  agent_ref& operator=(agent_ref&& other)
+  agent_ref& operator=(agent_ref&& other) noexcept
   {
     ptr = std::move(other.ptr);
     return *this;

@@ -11,8 +11,7 @@ class executor
   std::vector<std::jthread> workers;
 
 public:
-  executor() noexcept
-  { }
+  executor() noexcept = default;
 
   template<class F, class... Args>
   explicit executor(F&& f, uint num_workers, Args&&... args)
