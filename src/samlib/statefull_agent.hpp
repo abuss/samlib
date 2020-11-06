@@ -6,7 +6,7 @@ namespace samlib
 {
 
 template<typename State, typename Tin>
-class agent
+class statefull_agent
   : public base_agent<Tin>
 {
 protected:
@@ -17,18 +17,17 @@ protected:
   task_t task;
 
 public:
-  using agent_ref_type = agent_ref<agent>;
 
-  constexpr explicit agent(State& gstate)
+  constexpr explicit statefull_agent(State& gstate)
     : state{&gstate}
   { }
 
-  constexpr agent(State& gstate, task_t fn)
+  constexpr statefull_agent(State& gstate, task_t fn)
     : state{&gstate},
       task{fn}
   { }
 
-  virtual ~agent() = default;
+  virtual ~statefull_agent() = default;
 
   void run(const std::stop_token& st)
   {
@@ -37,10 +36,6 @@ public:
     }
   }
 
-  constexpr agent_ref_type ref() noexcept
-  {
-    return agent_ref_type(this);
-  }
 };
 
 

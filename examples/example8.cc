@@ -48,10 +48,10 @@ int main()
 
   env_t env;
 
-  env_t::agent_ref_type<payload> p1, p2;
+  samlib::agent_ref<payload> p1, p2;
 
-  p1 = env.make_agent<payload>(samlib::transform(ping, p2));
-  p2 = env.make_agent<payload>(samlib::transform(pong, p1));
+  p1 = env.make_statefull_agent<payload>(samlib::transform(ping, p2));
+  p2 = env.make_statefull_agent<payload>(samlib::transform(pong, p1));
 
   // st.start_agents();
 

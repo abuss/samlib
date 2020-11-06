@@ -1,14 +1,17 @@
 #pragma once
 
+#include <memory>
+
 namespace samlib
 {
 
-template<typename A>
+template<typename T>
 class agent_ref
 {
-  using agent_t = A;
+  using agent_t = base_agent<T>;
   std::shared_ptr<agent_t> ptr;
-  using message_t = typename agent_t::message_type;
+  
+  using message_t = T;
 
 public:
   constexpr agent_ref()

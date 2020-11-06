@@ -1,6 +1,6 @@
 #include <unistd.h>
 #include <iostream>
-#include <samlib/agent.hpp>
+#include <samlib/base_agent.hpp>
 #include <samlib/environment.hpp>
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
@@ -45,7 +45,7 @@ TEST_CASE("external state") {
     state my_state = state();
     env_t env(my_state);
 
-    auto a = env.create_agent<my_agent<env_t>>();
+    auto a = env.create_statefull_agent<my_agent<env_t>>();
 
     sleep(1);
     a.send(1.234);

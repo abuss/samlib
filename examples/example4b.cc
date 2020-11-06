@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <iostream>
 
-#include <samlib/agent.hpp>
+#include <samlib/statefull_agent.hpp>
 #include <samlib/tasks.hpp>
 #include <samlib/environment.hpp>
 
@@ -24,11 +24,11 @@ int main()
 
   env_t env;
 
-  using agent_t = samlib::agent<env_t, size_t>;
-  samlib::agent_ref<agent_t> p1, p2;
+  using agent_t = samlib::statefull_agent<env_t, size_t>;
+  samlib::agent_ref<size_t> p1, p2;
 
-  p1 = env.create_agent<agent_t>(transform(ping, p2));
-  p2 = env.create_agent<agent_t>(transform(pong, p1));
+  p1 = env.create_statefull_agent<agent_t>(transform(ping, p2));
+  p2 = env.create_statefull_agent<agent_t>(transform(pong, p1));
 
   sleep(1);
 

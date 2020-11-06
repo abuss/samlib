@@ -16,8 +16,6 @@ protected:
   task_t task;
 
 public:
-  using agent_ref_type = agent_ref<stateless_agent>;
-
   constexpr explicit stateless_agent(task_t fn)
     : task{fn}
   { }
@@ -31,10 +29,6 @@ public:
     }
   }
 
-  constexpr agent_ref_type ref() noexcept
-  {
-    return agent_ref_type(this);
-  }
 };
 
 

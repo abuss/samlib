@@ -79,7 +79,7 @@ TEST_CASE("stateless agent") {
     env_t env;
 
     env.create_stateless_agent<my_stateless_agent>();
-    auto a = env.get_agent_ref<my_stateless_agent>("_1");
+    auto a = env.get_agent_ref<double>("_1");
 
     sleep(1);
     a.send(1.234);
@@ -96,7 +96,7 @@ TEST_CASE("stateless agent") {
     env_t env;
 
     auto b = env.create_stateless_agent_named<my_stateless_agent>("agent_a");
-    auto a = env.get_agent_ref<my_stateless_agent>("agent_a");
+    auto a = env.get_agent_ref<double>("agent_a");
 
     sleep(1);
     b.send(1.234);
@@ -120,7 +120,7 @@ TEST_CASE("stateful agent") {
 
     env_t env;
 
-    auto a = env.create_agent_named<my_agent<env_t>>("agent_a");
+    auto a = env.create_statefull_agent_named<my_agent<env_t>>("agent_a");
 
     sleep(1);
     a.send(1.234);
@@ -141,8 +141,8 @@ TEST_CASE("stateful agent") {
 
     env_t env;
 
-    env.create_agent<my_agent<env_t>>();
-    auto a = env.get_agent_ref<my_agent<env_t>>("_1");
+    env.create_statefull_agent<my_agent<env_t>>();
+    auto a = env.get_agent_ref<double>("_1");
 
     sleep(1);
     a.send(1.234);
@@ -163,8 +163,8 @@ TEST_CASE("stateful agent") {
 
     env_t env;
 
-    auto b = env.create_agent_named<my_agent<env_t>>("agent_a");
-    auto a = env.get_agent_ref<my_agent<env_t>>("agent_a");
+    auto b = env.create_statefull_agent_named<my_agent<env_t>>("agent_a");
+    auto a = env.get_agent_ref<double>("agent_a");
 
     sleep(1);
     b.send(1.234);

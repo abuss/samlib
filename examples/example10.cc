@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 {
 
   using env_t = samlib::environment<>;
-  using agent_ref_t = env_t::agent_ref_type<size_t>;
+  using agent_ref_t = samlib::agent_ref<size_t>;
 
   int n = 5;
   if (argc > 1)
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   std::vector<agent_ref_t> agents(n);
 
   for (int i = 0; i < n; ++i) {
-    agents[i] = env.make_agent<size_t>(samlib::transform(fn_factory(i), agents[(i + 1) % n]));
+    agents[i] = env.make_statefull_agent<size_t>(samlib::transform(fn_factory(i), agents[(i + 1) % n]));
   }
 
   //st.start_agents();

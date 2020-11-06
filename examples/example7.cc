@@ -43,11 +43,10 @@ int main()
 
   env_t env;
 
-  env_t::agent_ref_type<size_t> p1;
-  env_t::agent_ref_type<size_t> p2;
+  samlib::agent_ref<size_t> p1, p2;
 
-  p1 = env.make_agent<size_t>(my_generator(gen, p2));
-  p2 = env.make_agent<size_t>(samlib::sink(hole));
+  p1 = env.make_statefull_agent<size_t>(my_generator(gen, p2));
+  p2 = env.make_statefull_agent<size_t>(samlib::sink(hole));
 
   // st.start_agents();
 

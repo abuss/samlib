@@ -41,21 +41,19 @@ struct engine
   using env_t = samlib::environment<>;
 
   env_t env;
+  samlib::agent_ref<size_t> p1, p2;
 
   template<typename Gen, typename Sink>
   engine(Gen _generator, Sink _sink)
   {
-    env_t::stateless_agent_ref_type<size_t> p1;
-    env_t::agent_ref_type<size_t>           p2;
-
     p1 = env.make_stateless_agent<size_t>(my_generator(_generator, p2));
-    p2 = env.make_agent<size_t>(samlib::sink(_sink));
+    p2 = env.make_statefull_agent<size_t>(samlib::sink(_sink));
   }
 
   void run_for(size_t n, u_int t)
   {
-    auto p1 = env.template get_agent_ref<samlib::stateless_agent<size_t>>("_1");
-    // auto p2 = env.template get_agent_ref<samlib::agent<env_t, size_t>>("_2");
+    auto p1 = env.template get_agent_ref<size_t>("_1");
+  
     p1.send(n);
 
     sleep(t);

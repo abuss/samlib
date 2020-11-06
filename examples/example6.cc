@@ -23,7 +23,7 @@ int main()
   using env_t = samlib::environment<>;
 
   env_t                                   env;
-  env_t::stateless_agent_ref_type<size_t> p1, p2;
+  samlib::agent_ref<size_t> p1, p2;
 
   p1 = env.make_stateless_agent<size_t>(samlib::stateless::generator(gen, p2));
   p2 = env.make_stateless_agent<size_t>(samlib::stateless::sink(hole));

@@ -5,82 +5,62 @@
 #include <samlib/base_agent.hpp>
 #include <samlib/agent_ref.hpp>
 
-template<typename State, typename T, typename Task>
+
+template<typename Tin, typename Tout = Tin>
 struct ping_pong_agent
-  : public samlib::base_agent<T>
+  : public samlib::base_agent<Tin>
 {
-  State* state;
+  using base_t = samlib::base_agent<Tin>;
+  using ntask_t = std::function<Tout(Tin)>;
+  using agent_ref_type = samlib::agent_ref<Tin>;
 
-  using agent_ref_t = samlib::base_agent<T>;
+  ntask_t         ntask;
+  agent_ref_type& out;
 
-  agent_ref_t* output;
-
-  Task producer;
-
-  ping_pong_agent()
-    : state{nullptr}
+  constexpr ping_pong_agent(ntask_t&& fn, agent_ref_type& d)
+    : ntask{fn},
+      out(d)
   { }
 
-  ping_pong_agent(State& gstate, Task fn)
-    : state(&gstate),
-      producer(fn)
-  { }
-
-  ~ping_pong_agent() { }
-
-  void set_output(agent_ref_t& out)
+  agent_ref_type ref() noexcept
   {
-    output = &out;
+    return agent_ref_type(this);
   }
 
-  void run(const std::stop_token& stoken) override
+  void run(const std::stop_token& st) override
   {
-    while (!stoken.stop_requested()) {
+    while (!st.stop_requested()) {
       auto data = this->receive();
-      auto new_data = producer(*data);
-      output->send(*new_data);
+      auto new_data = ntask(*data);
+      out.send(new_data);
     }
   }
 };
 
 
-struct ping
+double ping(double val)
 {
-  std::optional<double> operator()(double val)
-  {
-    printf("Ping -> %f\n", val++);
-    return val;
-  }
-};
+  printf("Ping -> %f\n", val++);
+  return val;
+}
 
 
-struct pong
+double pong(double val)
 {
-  std::optional<double> operator()(double val)
-  {
-    printf("%f <- Pong\n", val++);
-    return val;
-  }
-};
+  printf("%f <- Pong\n", val++);
+  return val;
+}
 
 
 int main()
 {
-  struct state
-  { };
-  state st;
+  using agent_t = ping_pong_agent<double>;
+  using agent_ref_t = agent_t::agent_ref_type;
 
-  using ping_t = ping_pong_agent<state, double, ping>;
-  using pong_t = ping_pong_agent<state, double, pong>;
+  agent_ref_t p1, p2;
 
-  using ref_ping_t = samlib::agent_ref<ping_t>;
-  using ref_pong_t = samlib::agent_ref<pong_t>;
-
-  ref_ping_t p1(std::make_shared<ping_t>(st, ping()));
-  ref_pong_t p2(std::make_shared<pong_t>(st, pong()));
-
-  p1.ref_agent().set_output(p2.ref_agent());
-  p2.ref_agent().set_output(p1.ref_agent());
+  p1 = agent_ref_t(std::make_shared<agent_t>(ping, p2));
+  p2 = agent_ref_t(std::make_shared<agent_t>(pong, p1));
 
   p1.start();
   p2.start();
@@ -95,5 +75,4 @@ int main()
 
   p1.stop();
   p2.stop();
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }

@@ -12,9 +12,9 @@ struct ping_pong_agent
 {
   using base_t = samlib::base_agent<Tin>;
   using ntask_t = std::function<Tout(Tin)>;
-  using agent_ref_type = samlib::agent_ref<ping_pong_agent>;
+  using agent_ref_type = samlib::agent_ref<Tin>;
 
-  using dest_agent_t = samlib::agent_ref<ping_pong_agent<Tin, Tout>>;
+  using dest_agent_t = samlib::agent_ref<Tout>;
 
   ntask_t       ntask;
   dest_agent_t& out;
