@@ -16,7 +16,7 @@ build:
     - build/test/test3
     - build/examples/* 
   script:
-    - cd build; cmake .. -DCMAKE_CXX_COMPILER=g++-10; make
+    - mkdir build; cd build; cmake .. -DCMAKE_CXX_COMPILER=g++-10; make
 
 test:
   stage: test
