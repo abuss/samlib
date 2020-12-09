@@ -14,11 +14,11 @@ namespace samlib
 using namespace std::literals::chrono_literals;
 
 template<typename T>
-class mailbox
+class mpmc_queue
   : moodycamel::ConcurrentQueue<T>
 {
 
-  bool stop_flag = false;
+  std::atomic_bool stop_flag = false;
 
 public:
   typedef T value_type;

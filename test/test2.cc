@@ -1,7 +1,6 @@
 #include <unistd.h>
 #include <iostream>
 #include <samlib/base_agent.hpp>
-#include <samlib/mailbox.hpp>
 #include <samlib/environment.hpp>
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
@@ -10,7 +9,12 @@
 struct my_stateless_agent
   : public samlib::base_agent<double>
 {
-  my_stateless_agent() {};
+  my_stateless_agent() {}
+
+  template<typename C>
+  my_stateless_agent(C& ch) 
+    : samlib::base_agent<double>{ch}
+  { }
 
   void run(const std::stop_token&)
   {

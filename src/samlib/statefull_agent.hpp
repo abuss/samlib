@@ -5,25 +5,27 @@
 namespace samlib
 {
 
-template<typename State, typename Tin>
+template<typename Env, typename Tin>
 class statefull_agent
   : public base_agent<Tin>
 {
 protected:
   using base_t = base_agent<Tin>;
-  using task_t = std::function<void(State&, typename base_t::mailbox_type&)>;
+  using task_t = std::function<void(Env&, typename base_t::mailbox_type&)>;
 
-  State* state;
+  Env&   environment;
   task_t task;
 
 public:
 
-  constexpr explicit statefull_agent(State& gstate)
-    : state{&gstate}
+  constexpr explicit statefull_agent(Env& env)
+    : base_t{env.template make_channel<Tin>()},
+      environment{env}
   { }
 
-  constexpr statefull_agent(State& gstate, task_t fn)
-    : state{&gstate},
+  constexpr statefull_agent(Env& env, task_t fn)
+    : base_t{env.template make_channel<Tin>()},
+      environment{env},
       task{fn}
   { }
 
@@ -32,7 +34,7 @@ public:
   void run(const std::stop_token& st)
   {
     while (!st.stop_requested()) {
-      task(*state, this->mbox());
+      task(environment, this->mailbox);
     }
   }
 

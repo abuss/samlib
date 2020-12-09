@@ -13,15 +13,15 @@ struct ping_pong_agent
   using base_t = samlib::base_agent<Tin>;
   using ntask_t = std::function<Tout(Tin)>;
   using agent_ref_type = samlib::agent_ref<Tin>;
-
+  
   ntask_t         ntask;
   agent_ref_type& out;
-
+  
   constexpr ping_pong_agent(ntask_t&& fn, agent_ref_type& d)
     : ntask{fn},
       out(d)
   { }
-
+  
   agent_ref_type ref() noexcept
   {
     return agent_ref_type(this);
@@ -55,7 +55,7 @@ double pong(double val)
 int main()
 {
   using agent_t = ping_pong_agent<double>;
-  using agent_ref_t = agent_t::agent_ref_type;
+  using agent_ref_t = samlib::agent_ref<double>;
 
   agent_ref_t p1, p2;
 

@@ -1,10 +1,9 @@
 #pragma once
 
-// #include <jthread.hpp>
 #include <functional>
 
 #include <samlib/agent_worker.hpp>
-#include <samlib/mailbox.hpp>
+#include <samlib/channel.hpp>
 
 namespace samlib
 {
@@ -14,48 +13,59 @@ class base_agent
   : public agent_worker
 {
 protected:
+
   inline std::optional<T> receive()
   {
-    return _mbox.receive();
+    return mailbox.receive();
   }
 
   inline std::optional<T> try_receive()
   {
-    return _mbox.try_receive();
+    return mailbox.try_receive();
   }
 
 public:
-  using mailbox_type = mailbox<T>;
+
+  using mailbox_type = channel<T>;
   using message_type = T;
+
+  base_agent()
+    : mailbox{*(new channel<T>())},
+      destroy_mailbox{true} 
+  { }
+
+  base_agent(mailbox_type& chn) : mailbox{chn}
+  { }
 
   virtual ~base_agent()
   {
     stop();
+    if (destroy_mailbox)
+      delete &mailbox;
   }
 
   void stop()
   {
-    _mbox.close();
+    mailbox.close();
     agent_worker::stop();
   }
 
   bool send(const T& value)
   {
-    return _mbox.send(value);
+    return mailbox.send(value);
   }
 
   bool send(T&& value)
   {
-    return _mbox.send(std::forward<T>(value));
+    return mailbox.send(std::forward<T>(value));
   }
 
-  mailbox_type& mbox()
-  {
-    return _mbox;
-  }
+protected:
+  mailbox_type&  mailbox;
 
 private:
-  mailbox_type  _mbox;
+  bool destroy_mailbox = false;
+
 };
 
 } // namespace samlib

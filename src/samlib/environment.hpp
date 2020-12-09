@@ -8,6 +8,7 @@
 #include <any>
 #include <sstream>
 
+#include <samlib/postoffice.hpp>
 #include <samlib/statefull_agent.hpp>
 #include <samlib/stateless_agent.hpp>
 #include <samlib/agent_ref.hpp>
@@ -18,7 +19,7 @@ namespace samlib
 namespace utility
 {
 
-  // Needed until std::format is included
+  // TODO: Needed until std::format is included
   std::string genName(int i)
   {
     std::ostringstream res;
@@ -48,42 +49,45 @@ class environment
   using agent_def_t = std::vector<agent_def_item>;
   using agent_ref_name_t = std::unordered_map<std::string, std::any>;
 
-  std::shared_ptr<State>            _state;
-  std::shared_ptr<agent_def_t>      _agents;
-  std::shared_ptr<agent_ref_name_t> _agent_names;
+  std::shared_ptr<postoffice>       msg_sys;
+  std::shared_ptr<State>            global_state;
+  std::shared_ptr<agent_def_t>      agents;
+  std::shared_ptr<agent_ref_name_t> agent_names;
 
-  bool _autostart_agents = false;
-  int  _agent_counter = 0;
-  bool _in_use = false;
+  bool autostart_agents = false;
+  int  agent_counter = 0;
+  bool in_use = false;
 
 public:
   using state_type = State;
 
   explicit environment(bool auto_start = true)
-    : _autostart_agents(auto_start)
+    : autostart_agents(auto_start)
   {
-    _state = std::make_shared<State>();
-    _agents = std::make_shared<agent_def_t>();
-    _agent_names = std::make_shared<agent_ref_name_t>();
+    msg_sys = std::make_shared<postoffice>();
+    global_state = std::make_shared<State>();
+    agents = std::make_shared<agent_def_t>();
+    agent_names = std::make_shared<agent_ref_name_t>();
   }
 
   environment(const State& state, bool auto_start = true)
-    : _autostart_agents(auto_start)
+    : autostart_agents(auto_start)
   {
-    _state = std::make_shared<State>(state);
-    _agents = std::make_shared<agent_def_t>();
-    _agent_names = std::make_shared<agent_ref_name_t>();
+    msg_sys = std::make_shared<postoffice>();
+    global_state = std::make_shared<State>(state);
+    agents = std::make_shared<agent_def_t>();
+    agent_names = std::make_shared<agent_ref_name_t>();
   }
 
   template<typename In>
   void register_agent(agent_ref<In> ref, std::string name = "", u_int nworkers = 1)
   {
     if (name.empty())
-      name = utility::genName(++_agent_counter);
-    (*_agent_names)[name] = ref;
-    _agents->push_back(agent_def_item({ref.ref_agent(), nworkers}));
-    if (_autostart_agents) {
-      _in_use = true;
+      name = utility::genName(++agent_counter);
+    (*agent_names)[name] = ref;
+    agents->push_back(agent_def_item({ref.ref_agent(), nworkers}));
+    if (autostart_agents) {
+      in_use = true;
       ref.ref_agent().start(nworkers);
     }
   }
@@ -113,7 +117,7 @@ public:
   agent_ref<typename A::message_type> create_statefull_agent(Args... args)
   {
     agent_ref<typename A::message_type> ref(std::make_shared<A>(*this, args...));
-    std::string  name = utility::genName(++_agent_counter);
+    std::string  name = utility::genName(++agent_counter);
     register_agent(ref, name, 1);
     return ref;
   }
@@ -131,8 +135,8 @@ public:
   template<typename A, typename... Args>
   agent_ref<typename A::message_type> create_stateless_agent(Args... args)
   {
-    agent_ref<typename A::message_type> ref(std::make_shared<A>(args...));
-    std::string name = utility::genName(++_agent_counter);
+    agent_ref<typename A::message_type> ref(std::make_shared<A>(this->make_channel<typename A::message_type>(), args...));
+    std::string name = utility::genName(++agent_counter);
     register_agent(ref, name, 1);
     return ref;
   }
@@ -140,7 +144,7 @@ public:
   template<typename A, typename... Args>
   agent_ref<typename A::message_type> create_stateless_agent_named(std::string name, Args... args)
   {
-    agent_ref<typename A::message_type> ref(std::make_shared<A>(args...));
+    agent_ref<typename A::message_type> ref(std::make_shared<A>(this->make_channel<typename A::message_type>(), args...));
     register_agent(ref, name, 1);
     return ref;
   }
@@ -148,44 +152,45 @@ public:
   template<typename T>
   agent_ref<T> get_agent_ref(std::string name)
   {
-    if (_agent_names->contains(name))
-      return std::any_cast<agent_ref<T>>((*_agent_names)[name]);
+    if (agent_names->contains(name))
+      return std::any_cast<agent_ref<T>>((*agent_names)[name]);
     return agent_ref<T>(nullptr);
   }
 
   State& state() const
   {
-    return *_state;
+    return *global_state;
   }
 
   const State& get_state() const
   {
-    return *_state;
+    return *global_state;
   }
 
   void wait_for_agents()
   {
-    for (auto& a : *_agents)
+    for (auto& a : *agents)
       a.ref_worker.join();
   }
 
   void activate()
   {
-    _in_use = true;
+    in_use = true;
   }
 
   void start_agents()
   {
-    _in_use = true;
-    for (auto& a : *_agents) {
+    in_use = true;
+    for (auto& a : *agents) {
       a.ref_worker.start(a.num_workers);
     }
   }
 
   void stop_agents()
   {
-    _in_use = false;
-    for (auto& a : *_agents) {
+    in_use = false;
+    msg_sys->close();
+    for (auto& a : *agents) {
       a.ref_worker.stop();
     }
     // Extra time required to let the threads get informed about the stop request
@@ -194,8 +199,20 @@ public:
 
   bool active() const
   {
-    return _in_use;
+    return in_use;
   }
+
+  template<typename T>
+  constexpr channel<T>& make_channel()
+  {
+    return msg_sys->make_channel<T>();
+  }
+
+  const postoffice& mailboxes() const
+  {
+    return *msg_sys;
+  }
+
 };
 
 } // namespace samlib

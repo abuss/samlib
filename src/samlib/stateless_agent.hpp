@@ -20,12 +20,17 @@ public:
     : task{fn}
   { }
 
+  constexpr explicit stateless_agent(channel<Tin>& chn, task_t fn)
+    : base_t{chn},
+      task{fn}
+  { }
+
   virtual ~stateless_agent() = default;
 
   void run(const std::stop_token& st)
   {
     while (!st.stop_requested()) {
-      task(this->mbox());
+      task(this->mailbox);
     }
   }
 

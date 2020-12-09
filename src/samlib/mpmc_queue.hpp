@@ -6,7 +6,7 @@
 #include <chrono>
 
 #ifdef QUEUE_IMPLEMENTATION_concurrentqueue
-#include "adapters/mailbox_concurrentqueue.hpp"
+#include "adapters/mpmc_queue_concurrentqueue.hpp"
 #endif
 
 #ifdef QUEUE_IMPLEMENTATION_atomic_queue

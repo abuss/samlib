@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <samlib/base_agent.hpp>
-#include <samlib/mailbox.hpp>
+#include <samlib/mpmc_queue.hpp>
 #include <samlib/environment.hpp>
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
@@ -10,7 +10,7 @@
 
 TEST_CASE("testing mailbox") {
 
-  samlib::mailbox<double> mout;
+  samlib::mpmc_queue<double> mout;
 
   CHECK(mout.size_approx() == 0);
 
