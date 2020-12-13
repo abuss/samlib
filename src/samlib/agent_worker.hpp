@@ -16,12 +16,11 @@ public:
     stop();
   }
 
-  void start(uint num_workers = 1)
+  void start()
   {
-    _executor = executor([&](std::stop_token st) {
+    _executor = executor_type([&](std::stop_token st) {
       this->run(st);
-    },
-    num_workers);
+    });
   }
 
   void stop()
@@ -32,11 +31,6 @@ public:
   void wait()
   {
     _executor.join();
-  }
-
-  executor_type* get_executor()
-  {
-    return &_executor;
   }
 
   virtual void run(const std::stop_token& st) = 0;

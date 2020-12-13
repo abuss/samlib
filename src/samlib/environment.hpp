@@ -42,8 +42,7 @@ class environment
 
   struct agent_def_item
   {
-    agent_worker& ref_worker;
-    u_int         num_workers;
+    agent_worker& ref;
   };
 
   using agent_def_t = std::vector<agent_def_item>;
@@ -80,35 +79,35 @@ public:
   }
 
   template<typename In>
-  void register_agent(agent_ref<In> ref, std::string name = "", u_int nworkers = 1)
+  void register_agent(agent_ref<In> ref, std::string name = "")
   {
     if (name.empty())
       name = utility::genName(++agent_counter);
     (*agent_names)[name] = ref;
-    agents->push_back(agent_def_item({ref.ref_agent(), nworkers}));
+    agents->push_back(agent_def_item({ref.ref_agent()}));
     if (autostart_agents) {
       in_use = true;
-      ref.ref_agent().start(nworkers);
+      ref.ref_agent().start();
     }
   }
 
 
   template<typename In, typename Fn>
-  agent_ref<In> make_statefull_agent(Fn fn, std::string name = "", u_int nworkers = 1)
+  agent_ref<In> make_statefull_agent(Fn fn, std::string name = "")
   {
     using agent_t = statefull_agent<environment, In>;
     agent_ref<In> ref(std::make_shared<agent_t>(*this, fn));
-    register_agent(ref, name, nworkers);
+    register_agent(ref, name);
     return ref;
   }
 
 
   template<typename In, typename Fn>
-  agent_ref<In> make_stateless_agent(Fn fn, std::string name = "", u_int nworkers = 1)
+  agent_ref<In> make_stateless_agent(Fn fn, std::string name = "")
   {
     using agent_t = stateless_agent<In>;
     agent_ref<In> ref(std::make_shared<agent_t>(fn));
-    register_agent(ref, name, nworkers);
+    register_agent(ref, name);
     return ref;
   }
 
@@ -118,7 +117,7 @@ public:
   {
     agent_ref<typename A::message_type> ref(std::make_shared<A>(*this, args...));
     std::string  name = utility::genName(++agent_counter);
-    register_agent(ref, name, 1);
+    register_agent(ref, name);
     return ref;
   }
 
@@ -127,7 +126,7 @@ public:
   agent_ref<typename A::message_type> create_statefull_agent_named(std::string name, Args... args)
   {
     agent_ref<typename A::message_type> ref(std::make_shared<A>(*this, args...));
-    register_agent(ref, name, 1);
+    register_agent(ref, name);
     return ref;
   }
 
@@ -137,7 +136,7 @@ public:
   {
     agent_ref<typename A::message_type> ref(std::make_shared<A>(this->make_channel<typename A::message_type>(), args...));
     std::string name = utility::genName(++agent_counter);
-    register_agent(ref, name, 1);
+    register_agent(ref, name);
     return ref;
   }
 
@@ -145,7 +144,7 @@ public:
   agent_ref<typename A::message_type> create_stateless_agent_named(std::string name, Args... args)
   {
     agent_ref<typename A::message_type> ref(std::make_shared<A>(this->make_channel<typename A::message_type>(), args...));
-    register_agent(ref, name, 1);
+    register_agent(ref, name);
     return ref;
   }
 
@@ -170,7 +169,7 @@ public:
   void wait_for_agents()
   {
     for (auto& a : *agents)
-      a.ref_worker.join();
+      a.ref.join();
   }
 
   void activate()
@@ -182,7 +181,7 @@ public:
   {
     in_use = true;
     for (auto& a : *agents) {
-      a.ref_worker.start(a.num_workers);
+      a.ref.start();
     }
   }
 
@@ -191,7 +190,7 @@ public:
     in_use = false;
     msg_sys->close();
     for (auto& a : *agents) {
-      a.ref_worker.stop();
+      a.ref.stop();
     }
     // Extra time required to let the threads get informed about the stop request
     std::this_thread::sleep_for(std::chrono::milliseconds(5));

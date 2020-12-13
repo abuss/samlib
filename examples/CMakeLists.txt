@@ -22,3 +22,5 @@ ADD_SAMLIB_TEST(example11a example11a.cc)
 ADD_SAMLIB_TEST(example11b example11b.cc)
 
 ADD_SAMLIB_TEST(example12 example12.cc)
+
+ADD_SAMLIB_TEST(example13 example13.cc)
