@@ -40,19 +40,20 @@ class processing_agent
   using base_t = samlib::statefull_agent<Env,Tin>;
   using out_t = samlib::agent_ref<Tin>;
 
+  std::vector<out_t> workers;
+
 public:
   using base_t::base_t;
 
   void run(const std::stop_token& st) override
   {
-    printf("Init workers\n");
-    std::vector<out_t> workers;
     workers.push_back( this->environment.template make_statefull_agent<Tin>(this->task) );
     workers.push_back( this->environment.template make_statefull_agent<Tin>(this->task) );
     workers.push_back( this->environment.template make_statefull_agent<Tin>(this->task) );
     size_t i = 0;
     while (!st.stop_requested()) {
       if (auto data = this->mailbox.try_receive()) {
+        printf("Proc queue.size: %lu\n",this->mailbox.size());
         workers[i].send(*data * (2*i-1));
         i = (i+1) % workers.size();
       }
