@@ -44,14 +44,14 @@ payload pong(payload val)
 int main()
 {
 
-  using env_t = samlib::environment<>;
+  using env_t = samlib::environment;
 
   env_t env;
 
   samlib::agent_ref<payload> p1, p2;
 
-  p1 = env.make_statefull_agent<payload>(samlib::transform(ping, p2));
-  p2 = env.make_statefull_agent<payload>(samlib::transform(pong, p1));
+  p1 = env.make_agent<payload>(samlib::transform(ping, p2));
+  p2 = env.make_agent<payload>(samlib::transform(pong, p1));
 
   // st.start_agents();
 

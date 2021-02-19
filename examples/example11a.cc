@@ -48,7 +48,7 @@ void output(T val)
 
 int main()
 {
-  using env_t = samlib::environment<>;
+  using env_t = samlib::environment;
 
   env_t                                   env;
   samlib::agent_ref<size_t> p_gen;
@@ -57,16 +57,11 @@ int main()
 
   printf("------------ First version ---------------\n");
 
-  p_gen = env.make_stateless_agent<size_t>(
-    samlib::stateless::generator(generate, p_split));
-  p_split = env.make_stateless_agent<vect_t>(
-    samlib::stateless::splitter(p_min, p_max));
-  p_max = env.make_stateless_agent<vect_t>(
-    samlib::stateless::transform(max_value, p_out));
-  p_min = env.make_stateless_agent<vect_t>(
-    samlib::stateless::transform(min_value, p_out));
-  p_out = env.make_stateless_agent<out_t>(
-    samlib::stateless::sink(output<out_t>));
+  p_gen = env.make_agent<size_t>(samlib::generator(generate, p_split));
+  p_split = env.make_agent<vect_t>(samlib::splitter(p_min, p_max));
+  p_max = env.make_agent<vect_t>(samlib::transform(max_value, p_out));
+  p_min = env.make_agent<vect_t>(samlib::transform(min_value, p_out));
+  p_out = env.make_agent<out_t>(samlib::sink(output<out_t>));
 
   //st.start_agents();
 
@@ -78,14 +73,14 @@ int main()
 
   printf("------------ Second version ---------------\n");
 
-  auto p_gen2 = env.make_stateless_agent<size_t>(
-    samlib::stateless::generator(generate,
-      env.make_stateless_agent<vect_t>(
-        samlib::stateless::splitter(
-          env.make_stateless_agent<vect_t>(
-            samlib::stateless::transform(min_value, p_out)),
-          env.make_stateless_agent<vect_t>(
-            samlib::stateless::transform(max_value, p_out))
+  auto p_gen2 = env.make_agent<size_t>(
+    samlib::generator(generate,
+      env.make_agent<vect_t>(
+        samlib::splitter(
+          env.make_agent<vect_t>(
+            samlib::transform(min_value, p_out)),
+          env.make_agent<vect_t>(
+            samlib::transform(max_value, p_out))
         )
       )
     )

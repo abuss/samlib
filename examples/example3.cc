@@ -19,14 +19,14 @@ size_t pong(size_t val)
 
 int main()
 {
-  using env_t = samlib::environment<>;
+  using env_t = samlib::environment;
 
   env_t env;
 
   samlib::agent_ref<size_t> p1, p2;
 
-  p1 = env.make_statefull_agent<size_t>(samlib::transform(ping, p2), "p1");
-  p2 = env.make_statefull_agent<size_t>(samlib::transform(pong, p1), "p2");
+  p1 = env.make_agent<size_t>(samlib::transform(ping, p2), "p1");
+  p2 = env.make_agent<size_t>(samlib::transform(pong, p1), "p2");
 
   // st.start_agents();
 

@@ -7,11 +7,13 @@ namespace samlib
 
 using namespace std::literals::chrono_literals;
 
+// TODO: Define version to pass the state to the functions
+
 template<typename Fn, typename O>
 auto transform(Fn fn, O& out)
 {
-  return [fn, &out](auto&, auto& in_port) {
-    if (auto data = in_port.try_receive()) {
+  return [fn, &out](auto& agent) {
+    if (auto data = agent.try_receive()) {
       out.send(fn(std::move(*data)));
     }
   };
@@ -20,8 +22,8 @@ auto transform(Fn fn, O& out)
 template<typename Fn, typename O>
 auto transform(Fn fn, O&& out)
 {
-  return [fn, out](auto&, auto& in_port) {
-    if (auto data = in_port.try_receive()) {
+  return [fn, out](auto& agent) {
+    if (auto data = agent.try_receive()) {
       out.send(fn(std::move(*data)));
     }
   };
@@ -31,10 +33,10 @@ auto transform(Fn fn, O&& out)
 template<typename Fn, typename O>
 auto generator(Fn fn, O& out)
 {
-  return [fn, &out](const auto& env, auto& in_port) {
-    if (auto dat = in_port.try_receive()) {
+  return [fn, &out](auto& agent) {
+    if (auto dat = agent.try_receive()) {
       auto n = *dat;
-      while ((n > 0) && env.active()) {
+      while ((n > 0) && agent.environment.active()) {
         out.send(fn(n));
         --n;
       }
@@ -45,10 +47,10 @@ auto generator(Fn fn, O& out)
 template<typename Fn, typename O>
 auto generator(Fn fn, O&& out)
 {
-  return [fn, out](const auto& env, auto& in_port) {
-    if (auto dat = in_port.try_receive()) {
+  return [fn, out](auto& agent) {
+    if (auto dat = agent.try_receive()) {
       auto n = *dat;
-      while ((n > 0) && env.active()) {
+      while ((n > 0) && agent.environment.active()) {
         out.send(fn(n));
         --n;
       }
@@ -58,8 +60,8 @@ auto generator(Fn fn, O&& out)
 
 
 auto sink = [](auto fn) {
-  return [fn](auto&, auto& in_port) {
-    if (auto data = in_port.try_receive())
+  return [fn](auto& agent) {
+    if (auto data = agent.try_receive())
       fn(*data);
   };
 };
@@ -68,8 +70,8 @@ auto sink = [](auto fn) {
 template<typename... O>
 auto splitter(O&... outs)
 {
-  return [&](auto, auto& in_port) {
-    if (auto data = in_port.try_receive()) {
+  return [&](auto& agent) {
+    if (auto data = agent.try_receive()) {
       for (auto out : {outs...})
         out.send(*data);
     }
@@ -79,8 +81,8 @@ auto splitter(O&... outs)
 template<typename... O>
 auto splitter(O&&... outs)
 {
-  return [=](auto, auto& in_port) {
-    if (auto data = in_port.try_receive()) {
+  return [=](auto& agent) {
+    if (auto data = agent.try_receive()) {
       for (auto out : {outs...})
         out.send(*data);
     }
@@ -88,7 +90,7 @@ auto splitter(O&&... outs)
 }
 
 
-namespace stateless
+namespace stateless_off
 {
 
   template<typename Fn, typename O>
