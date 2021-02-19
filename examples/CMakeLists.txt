@@ -10,6 +10,7 @@ ADD_SAMLIB_TEST(example3 example3.cc)
 
 ADD_SAMLIB_TEST(example4a example4a.cc)
 ADD_SAMLIB_TEST(example4b example4b.cc)
+ADD_SAMLIB_TEST(example4c example4c.cc)
 
 ADD_SAMLIB_TEST(example5 example5.cc)
 ADD_SAMLIB_TEST(example6 example6.cc)

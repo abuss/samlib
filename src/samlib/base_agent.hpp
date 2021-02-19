@@ -12,7 +12,7 @@ template<typename T>
 class base_agent
   : public agent_worker
 {
-protected:
+public:
 
   inline std::optional<T> receive()
   {
@@ -23,8 +23,6 @@ protected:
   {
     return mailbox.try_receive();
   }
-
-public:
 
   using mailbox_type = channel<T>;
   using message_type = T;

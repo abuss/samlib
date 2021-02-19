@@ -5,6 +5,12 @@
 namespace samlib
 {
 
+template<typename A, typename Ref>
+constexpr auto& state_of(Ref& ref) {
+  return static_cast<A&>(ref.ref_agent());
+}  
+
+
 template<typename T>
 class agent_ref
 {

@@ -9,9 +9,9 @@
 auto my_generator = [](auto fn, auto& out) {
   using namespace std::literals::chrono_literals;
 
-  return [fn, &out](auto& in_port) {
+  return [fn, &out](auto& agent) {
     size_t sum = 0;
-    if (auto data = in_port.receive()) {
+    if (auto data = agent.receive()) {
       auto n = *data;
       while ((n > 0)) {
         auto val = fn(n);
@@ -38,7 +38,7 @@ size_t gen(size_t val)
 
 struct engine
 {
-  using env_t = samlib::environment<>;
+  using env_t = samlib::environment;
 
   env_t env;
   samlib::agent_ref<size_t> p1, p2;
@@ -46,13 +46,13 @@ struct engine
   template<typename Gen, typename Sink>
   engine(Gen _generator, Sink _sink)
   {
-    p1 = env.make_stateless_agent<size_t>(my_generator(_generator, p2));
-    p2 = env.make_statefull_agent<size_t>(samlib::sink(_sink));
+    p1 = env.make_agent<size_t>(my_generator(_generator, p2));
+    p2 = env.make_agent<size_t>(samlib::sink(_sink));
   }
 
   void run_for(size_t n, u_int t)
   {
-    auto p1 = env.template get_agent_ref<size_t>("_1");
+    auto p1 = env.get_agent_ref<size_t>("_1");
   
     p1.send(n);
 

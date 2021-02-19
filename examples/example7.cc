@@ -9,11 +9,11 @@
 auto my_generator = [](auto fn, auto& out) {
   using namespace std::literals::chrono_literals;
 
-  return [fn, &out](auto& env, auto& in_port) {
+  return [fn, &out](auto& agent) {
     size_t sum = 0;
-    if (auto data = in_port.receive()) {
+    if (auto data = agent.receive()) {
       auto n = *data;
-      while (n > 0 && env.active()) {
+      while (n > 0 && agent.environment.active()) {
         auto val = fn(n);
         sum += val;
         out.send(val);
@@ -39,14 +39,14 @@ size_t gen(size_t val)
 int main()
 {
 
-  using env_t = samlib::environment<>;
+  using env_t = samlib::environment;
 
   env_t env;
 
   samlib::agent_ref<size_t> p1, p2;
 
-  p1 = env.make_statefull_agent<size_t>(my_generator(gen, p2));
-  p2 = env.make_statefull_agent<size_t>(samlib::sink(hole));
+  p1 = env.make_agent<size_t>(my_generator(gen, p2));
+  p2 = env.make_agent<size_t>(samlib::sink(hole));
 
   // st.start_agents();
 
