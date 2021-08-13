@@ -39,7 +39,7 @@ message("which queue: ${QUEUE_IMPLEMENTATION}")
 
 if ("${QUEUE_IMPLEMENTATION}" STREQUAL "concurrentqueue")
   set(GIT_REPO "cameron314/concurrentqueue")
-  set(VERSION 1.0.1)
+  set(VERSION 1.0.3)
 endif()
 
 if ("${QUEUE_IMPLEMENTATION}" STREQUAL "atomic_queue")
