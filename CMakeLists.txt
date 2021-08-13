@@ -52,7 +52,8 @@ endif()
 
 CPMAddPackage(
   NAME ConcurrentQueue
-  GITHUB_REPOSITORY ${GIT_REPO}
+  # GITHUB_REPOSITORY ${GIT_REPO}
+  GITHUB_REPOSITORY cameron314/concurrentqueue
   VERSION ${VERSION}
   DOWNLOAD_ONLY True
 )
